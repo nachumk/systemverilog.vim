@@ -1,6 +1,6 @@
 "Author: Nachum Kanovsky
 "Email: nkanovsky yahoo com
-"Version: 1.2
+"Version: 1.3
 if exists("b:did_indent")
 	finish
 endif
@@ -39,6 +39,7 @@ function! s:ConvertToCodes( codeline )
 	let delims = substitute(a:codeline, "\\<\\(\\%(initial\\|always\\|always_comb\\|always_ff\\|always_latch\\|final\\|begin\\|if\\|for\\|foreach\\|do\\|while\\|forever\\|repeat\\|case\\|fork\\|ifdef\\|else\\|end\\|endif\\|endcase\\|join\\|join_any\\|join_none\\|class\\|config\\|clocking\\|function\\|task\\|specify\\|covergroup\\|pure\\|assume\\|assert\\|cover\\|endclass\\|endconfig\\|endclocking\\|endfunction\\|endtask\\|endspecify\\|endgroup\\|property\\|endproperty\\|sequence\\|checker\\|endsequence\\|endchecker\\)\\>\\)\\@!\\k\\+", "", "g")
 	let delims = substitute(delims, "^\\s*\\/\\/.*$", "l", "g") " convert line comments and keep them b/c comments should not calculate new indent
 	let delims = substitute(delims, "\\/\\/.*", "", "g") " remove line comments after text (indentation based on text not comment)
+	let delims = substitute(delims, "\".*\"", "", "g") " remove strings
 	let delims = substitute(delims, "\\/\\*", "s", "g") " convert block comment start
 	let delims = substitute(delims, "\\*\\/", "p", "g") " convert block comment end
 	let delims = substitute(delims, "\\[[^:\\[\\]]*:[^:\\[\\]]*\\]", "", "g") "remove ranges
