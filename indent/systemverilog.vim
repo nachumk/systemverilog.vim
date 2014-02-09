@@ -1,5 +1,5 @@
 if exists("b:did_indent")
-"	finish
+	finish
 endif
 let b:did_indent = 1
 let b:in_block_comment = 0
@@ -9,7 +9,7 @@ setlocal indentkeys&
 setlocal indentkeys+==begin,=case,=if,=fork,=else,=end,=join,=join,),},;
 
 if exists("*GetSystemVerilogIndent")
-"	finish
+	finish
 endif
 
 let s:BLOCK_COMMENT_START = '^s.*$'
