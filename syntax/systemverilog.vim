@@ -1,6 +1,6 @@
 "Author: Nachum Kanovsky
 "Email: nkanovsky yahoo com
-"Version: 0.7
+"Version: 0.8
 if exists("b:current_syntax")
 	finish
 endif
