@@ -1,3 +1,6 @@
+"Author: Nachum Kanovsky
+"Email: nkanovsky yahoo com
+"Version: 0.5
 if exists("b:did_indent")
 	finish
 endif
@@ -6,7 +9,7 @@ let b:in_block_comment = 0
 
 setlocal indentexpr=GetSystemVerilogIndent(v:lnum)
 setlocal indentkeys&
-setlocal indentkeys+==begin,=case,=if,=fork,=else,=end,=join,=join,),},;
+setlocal indentkeys+==begin,=case,=if,=fork,=else,=end,=join,(,),{,},;
 
 if exists("*GetSystemVerilogIndent")
 	finish
