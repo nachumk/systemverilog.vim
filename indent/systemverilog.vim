@@ -1,11 +1,11 @@
 "Author: Nachum Kanovsky
 "Email: nkanovsky yahoo com
-"Version: 0.5
+"Version: 0.6
 if exists("b:did_indent")
 	finish
 endif
+
 let b:did_indent = 1
-let b:in_block_comment = 0
 
 setlocal indentexpr=GetSystemVerilogIndent(v:lnum)
 setlocal indentkeys&
@@ -35,8 +35,8 @@ let s:EXEC_LINE = '^.*;$'
 "x - 'if', 'else', 'for', 'do, 'while', 'always', 'initial', -- execution commands
 "c - 'pure'
 function! s:ConvertToCodes( codeline )
-	" keywords that don't affect indent: module endmodule package endpackage
-	let delims = substitute(a:codeline, "\\<\\(\\%(initial\\|always\\|always_comb\\|always_ff\\|always_latch\\|final\\|begin\\|if\\|for\\|do\\|while\\|repeat\\|case\\|fork\\|ifdef\\|else\\|end\\|endif\\|endcase\\|join\\|join_any\\|join_none\\|class\\|function\\|task\\|pure\\|endclass\\|endfunction\\|endtask\\)\\>\\)\\@!\\k\\+", "", "g")
+	" keywords that don't affect indent: module endmodule package endpackage interface endinterface
+	let delims = substitute(a:codeline, "\\<\\(\\%(initial\\|always\\|always_comb\\|always_ff\\|always_latch\\|final\\|begin\\|if\\|for\\|foreach\\|do\\|while\\|forever\\|repeat\\|case\\|fork\\|ifdef\\|else\\|end\\|endif\\|endcase\\|join\\|join_any\\|join_none\\|class\\|config\\|clocking\\|function\\|task\\|specify\\|covergroup\\|pure\\|endclass\\|endconfig\\|endclocking\\|endfunction\\|endtask\\|endspecify\\|endgroup\\|property\\|endproperty\\|sequence\\|checker\\|endsequence\\|endchecker\\)\\>\\)\\@!\\k\\+", "", "g")
 	let delims = substitute(delims, "^\\s*\\/\\/.*$", "l", "g") " convert line comments and keep them b/c comments should not calculate new indent
 	let delims = substitute(delims, "\\/\\/.*", "", "g") " remove line comments after text (indentation based on text not comment)
 	let delims = substitute(delims, "\\/\\*", "s", "g") " convert block comment start
@@ -47,9 +47,9 @@ function! s:ConvertToCodes( codeline )
 	let delims = substitute(delims, "\\(`\\<else\\>\\)", "eb", "g")
 	let delims = substitute(delims, "\\<\\(begin\\|case\\|fork\\)\\>", "b", "g")
 	let delims = substitute(delims, "\\<\\(end\\|endcase\\|join\\|join_any\\|join_none\\)\\>", "e", "g")
-	let delims = substitute(delims, "\\<\\(class\\|function\\|task\\)\\>", "f", "g")
-	let delims = substitute(delims, "\\<\\(endclass\\|endfunction\\|endtask\\)\\>", "h", "g")
-	let delims = substitute(delims, "\\<\\(if\\|else\\|for\\|do\\|while\\|repeat\\|always\\|initial\\)\\>", "x", "g")
+	let delims = substitute(delims, "\\<\\(class\\|config\\|clocking\\|function\\|task\\|specify\\|covergroup\\|property\\|sequence\\|checker\\)\\>", "f", "g")
+		let delims = substitute(delims, "\\<\\(endclass\\|endconfig\\|endclocking\\|endfunction\\|endtask\\|endspecify\\|endgroup\\|endproperty\\|endsequence\\|endchecker\\)\\>", "h", "g")
+	let delims = substitute(delims, "\\<\\(if\\|else\\|for\\|foreach\\|do\\|while\\|forever\\|repeat\\|always\\|always_comb\\|always_ff\\|always_latch\\|initial\\)\\>", "x", "g")
 	let delims = substitute(delims, "\\<\\(pure\\)\\>", "c", "g")
 	" convert (, ), only after whole word conversions are done
 	let delims = substitute(delims, "[({]", "b", "g") " convert ( to indicate start of indent
@@ -92,6 +92,8 @@ function! s:GetPrevNonCommentLineNum( line_num )
 	endwhile
 	return nline
 endfunction
+
+let b:in_block_comment = 0
 
 "Intending to handle block comment by seeing /* and forward reading till end to find */ and then storing a buffer local variable indicating last line of block comment, and b:changedtick (change number which always increments). Using that variable I can ignore normal indentation until I get there.
 function! GetSystemVerilogIndent( line_num )

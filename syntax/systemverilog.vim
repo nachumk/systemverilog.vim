@@ -1,16 +1,11 @@
 "Author: Nachum Kanovsky
 "Email: nkanovsky yahoo com
-"Version: 0.5
+"Version: 0.6
 if exists("b:current_syntax")
 	finish
 endif
 
 let b:current_syntax = "systemverilog"
-
-function! s:svSyntax( type, name, match )
-	let cmd = "syntax " . a:type . " " . a:name . " " . a:match
-	exec cmd
-endfunction
 
 syntax keyword svTodo TODO contained
 syntax match svLineComment "//.*" contains=svTodo
