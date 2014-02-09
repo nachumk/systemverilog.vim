@@ -6,7 +6,7 @@ let b:in_block_comment = 0
 
 setlocal indentexpr=GetSystemVerilogIndent(v:lnum)
 setlocal indentkeys&
-setlocal indentkeys+==begin,=case,=if,=fork,=else,=end,=join,=join,),;
+setlocal indentkeys+==begin,=case,=if,=fork,=else,=end,=join,=join,),},;
 
 if exists("*GetSystemVerilogIndent")
 "	finish
@@ -22,8 +22,8 @@ let s:BLOCK_INDENT_STOP = 'e'
 let s:LINE_INDENT = '^.*x$'
 let s:EXEC_LINE = '^.*;$'
 
-"b - 'begin', '('
-"e - 'end', ')'
+"b - 'begin', '(', '{'
+"e - 'end', ')', '{'
 "f - 'class', 'function', 'task'
 "h - 'endclass', 'endfunction', 'endtask'
 "l - '//' -- at start of line
@@ -49,8 +49,8 @@ function! s:ConvertToCodes( codeline )
 	let delims = substitute(delims, "\\<\\(if\\|else\\|for\\|do\\|while\\|repeat\\|always\\|initial\\)\\>", "x", "g")
 	let delims = substitute(delims, "\\<\\(pure\\)\\>", "c", "g")
 	" convert (, ), only after whole word conversions are done
-	let delims = substitute(delims, "(", "b", "g") " convert ( to indicate start of indent
-	let delims = substitute(delims, ")", "e", "g") " convert ) to indicate end of indent
+	let delims = substitute(delims, "[({]", "b", "g") " convert ( to indicate start of indent
+	let delims = substitute(delims, "[)}]", "e", "g") " convert ) to indicate end of indent
 	let delims = substitute(delims, "^\s*`.*", "", "g") " remove other preprocessor commands
 	let delims = substitute(delims, "[/@<=#,.]*", "", "g") "remove extraneous characters
 	let delims = substitute(delims, "\\s", "", "g") " remove whitespace
