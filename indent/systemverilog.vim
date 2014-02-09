@@ -1,5 +1,5 @@
 if exists("b:did_indent")
-	finish
+"	finish
 endif
 let b:did_indent = 1
 let b:in_block_comment = 0
@@ -9,7 +9,7 @@ setlocal indentkeys&
 setlocal indentkeys+==begin,=case,=if,=fork,=else,=end,=join,=join,),;
 
 if exists("*GetSystemVerilogIndent")
-	finish
+"	finish
 endif
 
 let s:BLOCK_COMMENT_START = '^s.*$'
@@ -30,9 +30,10 @@ let s:EXEC_LINE = '^.*;$'
 "s - '/*' -- start comment
 "p - '*/' -- stop comment
 "x - 'if', 'else', 'for', 'do, 'while', 'always', 'initial', -- execution commands
+"c - 'pure'
 function! s:ConvertToCodes( codeline )
 	" keywords that don't affect indent: module endmodule package endpackage
-	let delims = substitute(a:codeline, "\\<\\(\\%(initial\\|always\\|always_comb\\|always_ff\\|always_latch\\|final\\|begin\\|if\\|for\\|do\\|while\\|repeat\\|case\\|fork\\|ifdef\\|else\\|end\\|endif\\|endcase\\|join\\|join_any\\|join_none\\|class\\|function\\|task\\|endclass\\|endfunction\\|endtask\\)\\>\\)\\@!\\k\\+", "", "g")
+	let delims = substitute(a:codeline, "\\<\\(\\%(initial\\|always\\|always_comb\\|always_ff\\|always_latch\\|final\\|begin\\|if\\|for\\|do\\|while\\|repeat\\|case\\|fork\\|ifdef\\|else\\|end\\|endif\\|endcase\\|join\\|join_any\\|join_none\\|class\\|function\\|task\\|pure\\|endclass\\|endfunction\\|endtask\\)\\>\\)\\@!\\k\\+", "", "g")
 	let delims = substitute(delims, "^\\s*\\/\\/.*$", "l", "g") " convert line comments and keep them b/c comments should not calculate new indent
 	let delims = substitute(delims, "\\/\\/.*", "", "g") " remove line comments after text (indentation based on text not comment)
 	let delims = substitute(delims, "\\/\\*", "s", "g") " convert block comment start
@@ -46,6 +47,7 @@ function! s:ConvertToCodes( codeline )
 	let delims = substitute(delims, "\\<\\(class\\|function\\|task\\)\\>", "f", "g")
 	let delims = substitute(delims, "\\<\\(endclass\\|endfunction\\|endtask\\)\\>", "h", "g")
 	let delims = substitute(delims, "\\<\\(if\\|else\\|for\\|do\\|while\\|repeat\\|always\\|initial\\)\\>", "x", "g")
+	let delims = substitute(delims, "\\<\\(pure\\)\\>", "c", "g")
 	" convert (, ), only after whole word conversions are done
 	let delims = substitute(delims, "(", "b", "g") " convert ( to indicate start of indent
 	let delims = substitute(delims, ")", "e", "g") " convert ) to indicate end of indent
@@ -61,6 +63,7 @@ function! s:ConvertToCodes( codeline )
 	while (match(delims, "\\(s[^sp]*p\\)") != -1)
 		let delims = substitute(delims, "\\(s[^sp]*p\\)", "", "g") "remove any comment start stop pairs
 	endwhile
+	let delims = substitute(delims, "cf", "", "g")
 	return delims
 endfunction
 
