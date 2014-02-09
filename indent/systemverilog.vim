@@ -1,6 +1,6 @@
 "Author: Nachum Kanovsky
 "Email: nkanovsky yahoo com
-"Version: 0.9
+"Version: 1.0
 if exists("b:did_indent")
 	finish
 endif
