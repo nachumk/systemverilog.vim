@@ -3,7 +3,7 @@
 "Version: 1.4
 "URL: https://github.com/nachumk/systemverilog.vim
 if exists("b:did_indent")
-"	finish
+	finish
 endif
 
 let b:did_indent = 1
@@ -13,7 +13,7 @@ setlocal indentkeys&
 setlocal indentkeys+==begin,=case,=if,=fork,=else,=end,=join,(,),{,},;
 
 if exists("*GetSystemVerilogIndent")
-"	finish
+	finish
 endif
 
 function! s:CleanLine( codeline )
