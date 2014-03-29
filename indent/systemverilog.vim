@@ -1,6 +1,7 @@
 "Author: Nachum Kanovsky
 "Email: nkanovsky yahoo com
-"Version: 1.3
+"Version: 1.4
+"URL: https://github.com/nachumk/systemverilog.vim
 if exists("b:did_indent")
 	finish
 endif
@@ -98,13 +99,56 @@ let b:in_block_comment = 0
 
 "Intending to handle block comment by seeing /* and forward reading till end to find */ and then storing a buffer local variable indicating last line of block comment, and b:changedtick (change number which always increments). Using that variable I can ignore normal indentation until I get there.
 function! GetSystemVerilogIndent( line_num )
+	if a:line_num == 1
+		return 0
+	endif
+
 	let this_codeline = getline( a:line_num )
+	let prev1_line_num = prevnonblank( a:line_num - 1)
+	let prev1_codeline = getline( prev1_line_num )
+	let prev2_line_num = prev1_line_num - 1
+	let prev2_codeline = getline( prev2_line_num )
+
+	let indnt = indent( prev1_line_num )
+
+	" Check for line continuations ( line ends with backslash )
+	if ( matchend( prev1_codeline , "\\" ) != -1 )
+		if ( matchend( prev2_codeline , "\\" ) != -1 )
+			return indnt
+		else
+			return indnt + &shiftwidth
+		endif
+	else
+		if ( matchend( prev2_codeline , "\\" ) != -1 )
+			let indnt = indnt - &shiftwidth
+		endif
+	endif
+
+	" Set prev1_line_num to start of line continuations
+	while ( matchend( prev2_codeline , "\\" ) != -1 )
+		let prev1_codeline = strpart( prev2_codeline , 0 , strlen( prev2_codeline ) - 2 ) . " " . prev1_codeline 
+		let prev1_line_num = prev1_line_num - 1
+		let prev2_codeline = getline( prev1_line_num - 1 )
+	endwhile
+
+	let prev2_line_num = prevnonblank( prev1_line_num - 1 )
+	let prev2_codeline = getline( prev2_line_num )
+	let prev3_line_num = prev2_line_num - 1
+	let prev3_codeline = getline( prev3_line_num )
+
+	" Set prev1_line_num to start of line continuations
+	while ( matchend( prev3_codeline , "\\" ) != -1 )
+		let prev2_codeline = strpart( prev3_codeline , 0 , strlen( prev3_codeline ) - 2 ) . " " . prev2_codeline 
+		let prev2_line_num = prev2_line_num - 1
+		let prev3_codeline = getline( prev2_line_num - 1 )
+	endwhile
+
 	let this_codes = s:ConvertToCodes( this_codeline )
 
 "	echo (this_codes)
 "	return -1
 
-	if this_codes =~ s:BLOCK_COMMENT_STOP || b:block_comment_change != b:changedtick || b:block_comment_line != a:line_num - 1
+	if this_codes =~ s:BLOCK_COMMENT_STOP || b:block_comment_change != b:changedtick || b:block_comment_line != prev1_line_num
 		let b:in_block_comment = 0
 	endif
 	if this_codes =~ s:BLOCK_COMMENT_STOP
@@ -121,23 +165,7 @@ function! GetSystemVerilogIndent( line_num )
 		return -1
 	endif
 
-	" Line 1 always goes at column 0
-	if a:line_num == 1
-		return 0
-	endif
-
-	let prev1_codeline_num = s:GetPrevNonCommentLineNum( a:line_num )
-	let prev1_codeline = getline( prev1_codeline_num )
 	let prev1_codes = s:ConvertToCodes( prev1_codeline )
-
-	if prev1_codeline_num == 0
-		let indnt = 0
-	else
-		let indnt = indent( prev1_codeline_num )
-	endif
-
-	let prev2_codeline_num = s:GetPrevNonCommentLineNum( prev1_codeline_num )
-	let prev2_codeline = getline( prev2_codeline_num )
 	let prev2_codes = s:ConvertToCodes( prev2_codeline )
 
 	if prev2_codes =~ s:LINE_INDENT && prev1_codes =~ s:EXEC_LINE " used up single indent in previous line, return back to normal indent
