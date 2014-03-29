@@ -3,7 +3,7 @@
 "Version: 1.4
 "URL: https://github.com/nachumk/systemverilog.vim
 if exists("b:did_indent")
-	finish
+"	finish
 endif
 
 let b:did_indent = 1
@@ -13,8 +13,12 @@ setlocal indentkeys&
 setlocal indentkeys+==begin,=case,=if,=fork,=else,=end,=join,(,),{,},;
 
 if exists("*GetSystemVerilogIndent")
-	finish
+"	finish
 endif
+
+function! s:CleanLine( codeline )
+	return codeline = substitute( codeline , "\\\@<!\".*\\\@<!\"", "" , "g" )
+endfunction
 
 let s:BLOCK_COMMENT_START = '^s.*$'
 let s:BLOCK_COMMENT_STOP = '^.*p$'
@@ -112,20 +116,20 @@ function! GetSystemVerilogIndent( line_num )
 	let indnt = indent( prev1_line_num )
 
 	" Check for line continuations ( line ends with backslash )
-	if ( matchend( prev1_codeline , "\\" ) != -1 )
-		if ( matchend( prev2_codeline , "\\" ) != -1 )
+	if ( strpart( prev1_codeline , strlen(prev1_codeline) - 1 , 1) == "\\" )
+		if ( strpart( prev2_codeline , strlen(prev2_codeline) - 1 , 1) == "\\" )
 			return indnt
 		else
 			return indnt + &shiftwidth
 		endif
 	else
-		if ( matchend( prev2_codeline , "\\" ) != -1 )
+		if ( strpart( prev2_codeline , strlen(prev2_codeline) - 1 , 1) == "\\" )
 			let indnt = indnt - &shiftwidth
 		endif
 	endif
 
 	" Set prev1_line_num to start of line continuations
-	while ( matchend( prev2_codeline , "\\" ) != -1 )
+	while ( strpart( prev2_codeline , strlen(prev2_codeline) - 1 , 1) == "\\" )
 		let prev1_codeline = strpart( prev2_codeline , 0 , strlen( prev2_codeline ) - 2 ) . " " . prev1_codeline 
 		let prev1_line_num = prev1_line_num - 1
 		let prev2_codeline = getline( prev1_line_num - 1 )
@@ -137,7 +141,7 @@ function! GetSystemVerilogIndent( line_num )
 	let prev3_codeline = getline( prev3_line_num )
 
 	" Set prev1_line_num to start of line continuations
-	while ( matchend( prev3_codeline , "\\" ) != -1 )
+	while ( strpart( prev3_codeline , strlen(prev3_codeline) - 1 , 1) == "\\" )
 		let prev2_codeline = strpart( prev3_codeline , 0 , strlen( prev3_codeline ) - 2 ) . " " . prev2_codeline 
 		let prev2_line_num = prev2_line_num - 1
 		let prev3_codeline = getline( prev2_line_num - 1 )
