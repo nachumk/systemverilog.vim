@@ -6,11 +6,11 @@ SystemVerilog indent and syntax scripts
 Pathogen Install
 ----------------
 
-Pathogen is supported by putting the systemverilog.vim folder under the bundles directory.
+Pathogen is supported by putting the systemverilog.vim folder under the bundle directory.
 
 ### Install by cloning repository:
 
-    git clone git://github.com/nachumk/systemverilog.vim ~/.vim/bundles/systemverilog.vim
+    git clone git://github.com/nachumk/systemverilog.vim ~/.vim/bundle/systemverilog.vim
 
 ### Install from tarball:
 
