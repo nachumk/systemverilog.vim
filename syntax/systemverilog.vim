@@ -25,8 +25,15 @@ syntax match svLabel "^\W*[a-zA-Z_]\+[a-zA-Z_0-9,\[\]\t ]*:"he=e-1 contained
 syntax region svCase matchgroup=svConditional start="\<case\|casex\|casez\>" end="\<endcase\>" contains=ALL
 syntax keyword svRepeat for foreach do while forever repeat
 syntax keyword svKeyword fork join join_any join_none begin end module endmodule function endfunction task endtask always always_ff always_latch always_comb initial this generate endgenerate config endconfig class endclass clocking endclocking interface endinterface module endmodule package endpackage modport posedge negedge edge defparam assign deassign alias return disable wait continue and buf bufif0 bufif1 nand nor not or xnor xor tri tri0 tri1 triand trior trireg pull0 pull1 pullup pulldown cmos default endprimitive endspecify endtable force highz0 highz1 ifnone large macromodule medium nmos notif0 notif1 pmos primitive rcmos release rnmos rpmos rtran rtranif0 rtranif1 scalared small specify strong0 strong1 supply0 supply1 table tran tranif0 tranif1 vectored wand weak0 weak1 wor cell design incdir liblist library noshowcancelled pulsestyle_ondetect pulsestyle_onevent showcancelled use instance uwire assert assume before bind bins binsof break constraint context cover covergroup coverpoint cross dist endgroup endprogram endproperty endsequence enum expect extends final first_match ignore_bins illegal_bins inside intersect local longint matches new null packed priority program property pure randc randcase randsequence sequence solve struct super tagged throughout timeprecision timeunit type typedef union unique wait_order wildcard with within accept_on checker endchecker eventually global implies let nexttime reject_on restrict s_always s_eventually s_nexttime s_until s_until_with strong sync_accept_on sync_reject_on unique0 until until_with untyped weak implements interconnect nettype soft
-syntax match svInteger "\(\<[0-9_]\+\>\(\s*'\)\@!\|\(\<[0-9_]\+\>\)\?\(\s*'\([01ZzXx?]\|s\?\([Hh]\s*[0-9a-fA-FZzXx?_]\+\|[Dd?]\s*\([0-9_]\+\|[0-9ZzXx_]\)\|[Oo]\s*[0-7ZzXx?_]\+\|[Bb]\s*[01XxZz?_]\+\)\)\>\)\)"
-syntax match svTime "\<[0-9]\+\(ns\|ms\|us\|fs\|ps\|s\)\>"
+syntax match svInteger "\<\(\.\)\@<![0-9_]\+\(\s*['.]\)\@!\>"
+syntax match svInteger "\(\<[0-9_]\+\s*\)\?'\(s\|S\)\?\(d\|D\)\s*[0-9_ZzXx?]\+\>"
+syntax match svInteger "\(\<[0-9_]\+\s*\)\?'\(s\|S\)\?\(h\|H\)\s*[0-9a-fA-F_ZzXx?]\+\>"
+syntax match svInteger "\(\<[0-9_]\+\s*\)\?'\(s\|S\)\?\(o\|O\)\s*[0-7_ZzXx?]\+\>"
+syntax match svInteger "\(\<[0-9_]\+\s*\)\?'\(s\|S\)\?\(b\|B\)\s*[01_ZzXx?]\+\>"
+syntax match svInteger "\<'\(d\|D\|h\|H\|o\|O\|b\|B\)\>"
+syntax match svInteger "'[01xXzZ?]\>"
+syntax match svReal "\<[0-9_]\+\.[0-9_]\+\(\(e\|E\)[+-]\?[0-9_]\+\)\?\>"
+syntax match svReal "\<[0-9_]\+\(e\|E\)[+-]\?[0-9_]\+\>"
 syntax keyword svStructure struct union enum
 syntax keyword svTypedef typedef
 syntax match svInvSystemFunction "\$\(\K\k*\)"
@@ -53,6 +60,8 @@ highlight! default link svLabel Label
 highlight! default link svRepeat Repeat
 highlight! default link svKeyword Keyword
 highlight! default link svInteger Number
+highlight! default link svReal Number
+highlight! default link svIntegerBase none
 highlight! default link svTime Number
 highlight! default link svStructure Structure
 highlight! default link svTypedef Typedef
@@ -67,3 +76,4 @@ highlight! default link svPreprocessor none
 highlight! default link svSystemFunctionName none
 highlight! default link svInvPre none
 highlight! default link svInvSystemFunction none
+highlight! default link svDecimal none
