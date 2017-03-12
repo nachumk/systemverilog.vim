@@ -54,15 +54,12 @@ highlight! default link svPreProc PreProc
 highlight! default link svPreCondit PreCondit
 highlight! default link svInclude Include
 highlight! default link svDefine Define
-highlight! default link svMacro Macro
 highlight! default link svConditional Conditional
 highlight! default link svLabel Label
 highlight! default link svRepeat Repeat
 highlight! default link svKeyword Keyword
 highlight! default link svInteger Number
 highlight! default link svReal Number
-highlight! default link svIntegerBase none
-highlight! default link svTime Number
 highlight! default link svStructure Structure
 highlight! default link svTypedef Typedef
 highlight! default link svSystemFunction Function
@@ -70,10 +67,6 @@ highlight! default link svOperator Operator
 highlight! default link svDelimiter Delimiter
 highlight! default link svObjectFunctions Function
 
-highlight! default link svFunction none
 highlight! default link svCase none
-highlight! default link svPreprocessor none
-highlight! default link svSystemFunctionName none
 highlight! default link svInvPre none
 highlight! default link svInvSystemFunction none
-highlight! default link svDecimal none
