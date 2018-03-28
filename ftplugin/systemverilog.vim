@@ -1,6 +1,6 @@
 "Author: Nachum Kanovsky
 "Email: nkanovsky yahoo com
-"Version: 1.6
+"Version: 1.7
 if exists("b:did_ftplugin")
 	finish
 endif
