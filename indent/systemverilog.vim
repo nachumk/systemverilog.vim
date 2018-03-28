@@ -1,6 +1,6 @@
 "Author: Nachum Kanovsky
 "Email: nkanovsky yahoo com
-"Version: 1.5
+"Version: 1.6
 "URL: https://github.com/nachumk/systemverilog.vim
 if exists("b:did_indent")
 	finish
@@ -76,27 +76,28 @@ function! s:ConvertToCodes( codeline )
 	return delims
 endfunction
 
-function! s:GetPrevNonCommentLineNum( line_num )
-	let nline = a:line_num
-	let in_comment = 0
-	while nline > 0
-		let nline = prevnonblank( nline-1 )
-		let this_codeline = getline( nline )
-		let this_codes = s:ConvertToCodes( this_codeline )
-		if this_codes =~ s:LINE_COMMENT
-			continue
-		endif
-		if this_codes =~ s:BLOCK_COMMENT_STOP
-			let in_comment = 1
-		endif
-		if !in_comment
-			break
-		endif
-		if this_codes =~ s:BLOCK_COMMENT_START
-			let in_comment = 0
-		endif
+function! s:GetPrevWholeLineNum ( line_num )
+	let prev1_line_num = prevnonblank( a:line_num - 1)
+	let prev2_line_num = prev1_line_num - 1
+	let prev2_codeline = getline( prev2_line_num )
+	while ( strpart( prev2_codeline , strlen(prev2_codeline) - 1 , 1) == "\\" )
+		let prev1_line_num = prev1_line_num - 1
+		let prev2_line_num = prev1_line_num - 1
+		let prev2_codeline = getline( prev2_line_num )
 	endwhile
-	return nline
+
+	return prev1_line_num
+endfunction
+
+function! s:GetWholeLine ( line_num )
+	let line_num = a:line_num
+	let codeline = getline( line_num )
+	while ( strpart( codeline , strlen(codeline) - 1 , 1) == "\\" )
+		let line_num = line_num + 1
+		let codeline = strpart( codeline , 0 , strlen( codeline ) - 2 ) . " " . getline (line_num)
+	endwhile
+
+	return codeline
 endfunction
 
 let b:in_block_comment = 0
@@ -128,29 +129,34 @@ function! GetSystemVerilogIndent( line_num )
 		endif
 	endif
 
-	" Set prev1_line_num to start of line continuations
-	while ( strpart( prev2_codeline , strlen(prev2_codeline) - 1 , 1) == "\\" )
-		let prev1_codeline = strpart( prev2_codeline , 0 , strlen( prev2_codeline ) - 2 ) . " " . prev1_codeline 
-		let prev1_line_num = prev1_line_num - 1
-		let prev2_codeline = getline( prev1_line_num - 1 )
+	let prev1_line_num = s:GetPrevWholeLineNum (a:line_num)
+	let prev1_codeline = s:GetWholeLine (prev1_line_num)
+	let prev1_codes = s:ConvertToCodes(prev1_codeline)
+	while ( prev1_codes =~ s:LINE_COMMENT )
+		let prev1_line_num = s:GetPrevWholeLineNum (prev1_line_num)
+		let prev1_codeline = s:GetWholeLine (prev1_line_num)
+		let prev1_codes = s:ConvertToCodes(prev1_codeline)
 	endwhile
+	let indnt = indent( prev1_line_num )
 
-	let prev2_line_num = prevnonblank( prev1_line_num - 1 )
-	let prev2_codeline = getline( prev2_line_num )
-	let prev3_line_num = prev2_line_num - 1
-	let prev3_codeline = getline( prev3_line_num )
-
-	" Set prev1_line_num to start of line continuations
-	while ( strpart( prev3_codeline , strlen(prev3_codeline) - 1 , 1) == "\\" )
-		let prev2_codeline = strpart( prev3_codeline , 0 , strlen( prev3_codeline ) - 2 ) . " " . prev2_codeline 
-		let prev2_line_num = prev2_line_num - 1
-		let prev3_codeline = getline( prev2_line_num - 1 )
+	let prev2_line_num = s:GetPrevWholeLineNum (prev1_line_num)
+	let prev2_codeline = s:GetWholeLine (prev2_line_num)
+	let prev2_codes = s:ConvertToCodes(prev2_codeline)
+	while ( prev2_codes =~ s:LINE_COMMENT )
+		let prev2_line_num = s:GetPrevWholeLineNum (prev2_line_num)
+		let prev2_codeline = s:GetWholeLine (prev2_line_num)
+		let prev2_codes = s:ConvertToCodes(prev2_codeline)
+	endwhile
+	let prev3_line_num = s:GetPrevWholeLineNum (prev2_line_num)
+	let prev3_codeline = s:GetWholeLine (prev3_line_num)
+	let prev3_codes = s:ConvertToCodes(prev3_codeline)
+	while ( prev3_codes =~ s:LINE_COMMENT )
+		let prev3_line_num = s:GetPrevWholeLineNum (prev3_line_num)
+		let prev3_codeline = s:GetWholeLine (prev3_line_num)
+		let prev3_codes = s:ConvertToCodes(prev3_codeline)
 	endwhile
 
 	let this_codes = s:ConvertToCodes( this_codeline )
-
-"	echo (this_codes)
-"	return -1
 
 	if this_codes =~ s:BLOCK_COMMENT_STOP || b:block_comment_change != b:changedtick || b:block_comment_line != prev1_line_num
 		let b:in_block_comment = 0
@@ -168,9 +174,6 @@ function! GetSystemVerilogIndent( line_num )
 	if (this_codes =~ s:LINE_COMMENT)
 		return -1
 	endif
-
-	let prev1_codes = s:ConvertToCodes( prev1_codeline )
-	let prev2_codes = s:ConvertToCodes( prev2_codeline )
 
 	if prev2_codes =~ s:LINE_INDENT && prev1_codes =~ s:EXEC_LINE " used up single indent in previous line, return back to normal indent
 		let indnt = indnt - &shiftwidth
