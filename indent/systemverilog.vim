@@ -1,6 +1,6 @@
 "Author: Nachum Kanovsky
 "Email: nkanovsky yahoo com
-"Version: 1.7
+"Version: 1.8
 "URL: https://github.com/nachumk/systemverilog.vim
 if exists("b:did_indent")
 	finish
@@ -34,10 +34,13 @@ let s:EXEC_LINE = '^.*;$'
 "s - '/*' -- start comment
 "p - '*/' -- stop comment
 "x - 'if', 'else', 'for', 'do, 'while', 'always', 'initial', -- execution commands
-"c - 'pure'
 function! s:ConvertToCodes( codeline )
 	" keywords that don't affect indent: module endmodule package endpackage interface endinterface
-	let delims = substitute(a:codeline, "\\<\\(\\%(initial\\|always\\|always_comb\\|always_ff\\|always_latch\\|final\\|begin\\|if\\|for\\|foreach\\|do\\|while\\|forever\\|repeat\\|case\\|fork\\|ifdef\\|else\\|end\\|endif\\|endcase\\|join\\|join_any\\|join_none\\|class\\|config\\|clocking\\|function\\|task\\|specify\\|covergroup\\|pure\\|assume\\|assert\\|cover\\|endclass\\|endconfig\\|endclocking\\|endfunction\\|endtask\\|endspecify\\|endgroup\\|property\\|endproperty\\|sequence\\|checker\\|endsequence\\|endchecker\\)\\>\\)\\@!\\k\\+", "", "g")
+	let delims = substitute(a:codeline, '\<virtual\>', '', 'g') " remove keyword virtual - helps for pure <virtual> function/task
+	let delims = substitute(a:codeline, "\\<\\(\\%(initial\\|always\\|always_comb\\|always_ff\\|always_latch\\|final\\|begin\\|if\\|for\\|foreach\\|do\\|while\\|forever\\|repeat\\|randcase\\|case\\|casex\\|casez\\|wait\\|fork\\|ifdef\\|else\\|end\\|endif\\|endcase\\|join\\|join_any\\|join_none\\|class\\|config\\|clocking\\|function\\|task\\|specify\\|covergroup\\|pure\\|endclass\\|endconfig\\|endclocking\\|endfunction\\|endtask\\|endspecify\\|endgroup\\|property\\|endproperty\\|sequence\\|checker\\|endsequence\\|endchecker\\)\\>\\)\\@!\\k\\+", "", "g")
+	let delims = substitute(delims, 'wait\s\+fork', '', 'g') " remove wait fork
+	let delims = substitute(delims, 'pure\s\+function', '', 'g') " remove pure function
+	let delims = substitute(delims, 'pure\s\+task', '', 'g') " remove pure task
 	let delims = substitute(delims, "^\\s*\\/\\/.*$", "l", "g") " convert line comments and keep them b/c comments should not calculate new indent
 	let delims = substitute(delims, "\\/\\/.*", "", "g") " remove line comments after text (indentation based on text not comment)
 	let delims = substitute(delims, "\".*\"", "", "g") " remove strings
@@ -47,28 +50,31 @@ function! s:ConvertToCodes( codeline )
 	let delims = substitute(delims, "\\(`\\<if\\>\\|`\\<ifdef\\>\\)", "b", "g")
 	let delims = substitute(delims, "\\(`\\<endif\\>\\)", "e", "g")
 	let delims = substitute(delims, "\\(`\\<else\\>\\)", "eb", "g")
-	let delims = substitute(delims, "\\<\\(begin\\|case\\|fork\\)\\>", "b", "g")
+	let delims = substitute(delims, "\\<\\(begin\\|randcase\\|case\\|casex\\|casez\\|fork\\)\\>", "b", "g")
 	let delims = substitute(delims, "\\<\\(end\\|endcase\\|join\\|join_any\\|join_none\\)\\>", "e", "g")
 	let delims = substitute(delims, "\\<\\(class\\|config\\|clocking\\|function\\|task\\|specify\\|covergroup\\|property\\|sequence\\|checker\\)\\>", "f", "g")
 		let delims = substitute(delims, "\\<\\(endclass\\|endconfig\\|endclocking\\|endfunction\\|endtask\\|endspecify\\|endgroup\\|endproperty\\|endsequence\\|endchecker\\)\\>", "h", "g")
 	let delims = substitute(delims, "\\<\\(if\\|else\\|for\\|foreach\\|do\\|while\\|forever\\|repeat\\|always\\|always_comb\\|always_ff\\|always_latch\\|initial\\)\\>", "x", "g")
-	let delims = substitute(delims, "\\<\\(pure\\|assume\\|assert\\|cover\\)\\>", "c", "g")
+	let delims = substitute(delims, "\@", "x", "g")
 	" convert (, ), only after whole word conversions are done
 	let delims = substitute(delims, "[({]", "b", "g") " convert ( to indicate start of indent
 	let delims = substitute(delims, "[)}]", "e", "g") " convert ) to indicate end of indent
 	let delims = substitute(delims, "^\s*`.*", "", "g") " remove other preprocessor commands
 	let delims = substitute(delims, "[/@<=#,.]*", "", "g") "remove extraneous characters
 	let delims = substitute(delims, "\\s", "", "g") " remove whitespace
-	let delims = substitute(delims, "^:", "x", "g") " convert case branch (first on line)
+	let delims = substitute(delims, "^o\+:", "x", "g") " convert case branch (first on line)
 	let delims = substitute(delims, ":", "", "g") " remove labels
 	let delims = substitute(delims, "x\\+", "x", "g") " consolidate x
+	let delims = substitute(delims, "o\\+", "o", "g") " consolidate o
 	while (match(delims, "\\(b[^be]*e\\)") != -1)
 		let delims = substitute(delims, "\\(b[^be]*e\\)", "", "g") "remove any begin end pairs
+	endwhile
+	while (match(delims, "\\(f[^fh]*h\\)") != -1)
+		let delims = substitute(delims, "\\(f[^fh]*h\\)", "", "g") "remove any function endfunction pairs
 	endwhile
 	while (match(delims, "\\(s[^sp]*p\\)") != -1)
 		let delims = substitute(delims, "\\(s[^sp]*p\\)", "", "g") "remove any comment start stop pairs
 	endwhile
-	let delims = substitute(delims, "cf", "", "g")
 	return delims
 endfunction
 
