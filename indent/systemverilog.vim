@@ -37,13 +37,14 @@ let s:EXEC_LINE = '^.*;$'
 function! s:ConvertToCodes( codeline )
 	" keywords that don't affect indent: module endmodule package endpackage interface endinterface
 	let delims = substitute(a:codeline, '\<virtual\>', '', 'g') " remove keyword virtual - helps for pure <virtual> function/task
-	let delims = substitute(a:codeline, "\\<\\(\\%(initial\\|always\\|always_comb\\|always_ff\\|always_latch\\|final\\|begin\\|disable\\|if\\|extern\\|for\\|foreach\\|do\\|while\\|forever\\|repeat\\|randcase\\|case\\|casex\\|casez\\|wait\\|fork\\|ifdef\\|ifndef\\|else\\|end\\|endif\\|endcase\\|join\\|join_any\\|join_none\\|class\\|config\\|clocking\\|function\\|task\\|specify\\|covergroup\\|pure\\|endclass\\|endconfig\\|endclocking\\|endfunction\\|endtask\\|endspecify\\|endgroup\\|assume\\|assert\\|cover\\|property\\|endproperty\\|sequence\\|checker\\|endsequence\\|endchecker\\)\\>\\)\\@!\\k\\+", "", "g")
+	let delims = substitute(a:codeline, "\\<\\(\\%(initial\\|always\\|always_comb\\|always_ff\\|always_latch\\|final\\|begin\\|disable\\|if\\|iff\\|extern\\|for\\|foreach\\|do\\|while\\|forever\\|repeat\\|randcase\\|case\\|casex\\|casez\\|wait\\|fork\\|ifdef\\|ifndef\\|else\\|end\\|endif\\|endcase\\|join\\|join_any\\|join_none\\|class\\|config\\|clocking\\|function\\|task\\|specify\\|covergroup\\|pure\\|endclass\\|endconfig\\|endclocking\\|endfunction\\|endtask\\|endspecify\\|endgroup\\|assume\\|assert\\|cover\\|property\\|typedef\\|endproperty\\|sequence\\|checker\\|endsequence\\|endchecker\\)\\>\\)\\@!\\k\\+", "", "g")
 	let delims = substitute(delims, 'wait\s\+fork', '', 'g') " remove wait fork
 	let delims = substitute(delims, 'disable\s\+fork', '', 'g') " remove disable fork
 	let delims = substitute(delims, 'pure\s\+function', '', 'g') " remove pure function
 	let delims = substitute(delims, 'extern\s\+function', '', 'g') " remove extern function
 	let delims = substitute(delims, 'pure\s\+task', '', 'g') " remove pure task
 	let delims = substitute(delims, 'extern\s\+task', '', 'g') " remove extern task
+	let delims = substitute(delims, 'typedef\s\+class', '', 'g') " remove typedef class
 	let delims = substitute(delims, 'assert\s\+property', '', 'g') " remove assert property
 	let delims = substitute(delims, 'assume\s\+property', '', 'g') " remove assume property
 	let delims = substitute(delims, 'cover\s\+property', '', 'g') " remove cover property
@@ -60,7 +61,7 @@ function! s:ConvertToCodes( codeline )
 	let delims = substitute(delims, "\\<\\(end\\|endcase\\|join\\|join_any\\|join_none\\)\\>", "e", "g")
 	let delims = substitute(delims, "\\<\\(class\\|config\\|clocking\\|function\\|task\\|specify\\|covergroup\\|property\\|sequence\\|checker\\)\\>", "f", "g")
 	let delims = substitute(delims, "\\<\\(endclass\\|endconfig\\|endclocking\\|endfunction\\|endtask\\|endspecify\\|endgroup\\|endproperty\\|endsequence\\|endchecker\\)\\>", "h", "g")
-	let delims = substitute(delims, "\\<\\(if\\|else\\|for\\|foreach\\|do\\|while\\|forever\\|repeat\\|always\\|always_comb\\|always_ff\\|always_latch\\|initial\\)\\>", "x", "g")
+	let delims = substitute(delims, "\\<\\(if\\|iff\\|else\\|for\\|foreach\\|do\\|while\\|forever\\|repeat\\|always\\|always_comb\\|always_ff\\|always_latch\\|initial\\)\\>", "x", "g")
 	let delims = substitute(delims, "\@", "x", "g")
 	" convert (, ), only after whole word conversions are done
 	let delims = substitute(delims, "[({]", "b", "g") " convert ( to indicate start of indent
