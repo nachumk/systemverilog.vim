@@ -1,6 +1,6 @@
 "Author: Nachum Kanovsky
-"Email: nkanovsky yahoo com
-"Version: 1.9
+"Email: nkanovsky@yahoo.com
+"Version: 1.10
 if exists("b:did_ftplugin")
 	finish
 endif
@@ -15,7 +15,7 @@ if exists("loaded_matchit")
   let b:match_ignorecase=0
   let b:match_words=
         \ '\<begin\>:\<end\>,' .
-        \ '\<if\>:\<else\>,' .
+        \ '\<if\>\|\<assert\>:\<else\>,' .
         \ '\<module\>:\<endmodule\>,' .
         \ '\<class\>:\<endclass\>,' .
         \ '\<program\>:\<endprogram\>,' .
@@ -27,11 +27,11 @@ if exists("loaded_matchit")
         \ '\<primitive\>:\<endprimitive\>,' .
         \ '\<specify\>:\<endspecify\>,' .
         \ '\<generate\>:\<endgenerate\>,' .
-        \ '\<interface\>:\<endinterface\>,' .
+        \ '\<interface\>\(\s\+\<\k\+\>\s*[(#]\)\@=:\<endinterface\>,' .
         \ '\<function\>:\<endfunction\>,' .
         \ '\<task\>:\<endtask\>,' .
         \ '\<case\>\|\<casex\>\|\<casez\>:\<endcase\>,' .
-        \ '\<fork\>:\<join\>\|\<join_any\>\|\<join_none\>,' .
+        \ '\<\(\(disable\|wait\)\s\+\)\@<!fork\>:\<join\>\|\<join_any\>\|\<join_none\>,' .
         \ '`ifdef\>:`else\>:`endif\>,' .
         \ '\<generate\>:\<endgenerate\>'
 endif
