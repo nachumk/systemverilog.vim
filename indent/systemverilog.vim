@@ -45,6 +45,7 @@ function! s:ConvertToCodes( codeline )
 	let delims = substitute(delims, 'pure\s\+task', '', 'g') " remove pure task
 	let delims = substitute(delims, 'extern\s\+task', '', 'g') " remove extern task
 	let delims = substitute(delims, 'typedef\s\+class', '', 'g') " remove typedef class
+	let delims = substitute(delims, 'typedef', '', 'g') " remove typedef
 	let delims = substitute(delims, 'assert\s\+property', '', 'g') " remove assert property
 	let delims = substitute(delims, 'assume\s\+property', '', 'g') " remove assume property
 	let delims = substitute(delims, 'cover\s\+property', '', 'g') " remove cover property
@@ -61,7 +62,7 @@ function! s:ConvertToCodes( codeline )
 	let delims = substitute(delims, "\\<\\(end\\|endcase\\|join\\|join_any\\|join_none\\)\\>", "e", "g")
 	let delims = substitute(delims, "\\<\\(class\\|config\\|clocking\\|function\\|task\\|specify\\|covergroup\\|property\\|sequence\\|checker\\)\\>", "f", "g")
 	let delims = substitute(delims, "\\<\\(endclass\\|endconfig\\|endclocking\\|endfunction\\|endtask\\|endspecify\\|endgroup\\|endproperty\\|endsequence\\|endchecker\\)\\>", "h", "g")
-	let delims = substitute(delims, "\\<\\(if\\|iff\\|else\\|for\\|foreach\\|do\\|while\\|forever\\|repeat\\|always\\|always_comb\\|always_ff\\|always_latch\\|initial\\)\\>", "x", "g")
+	let delims = substitute(delims, "\\<\\(if\\|iff\\|else\\|assert\\|for\\|foreach\\|do\\|while\\|forever\\|repeat\\|always\\|always_comb\\|always_ff\\|always_latch\\|initial\\)\\>", "x", "g")
 	let delims = substitute(delims, "\@", "x", "g")
 	" convert (, ), only after whole word conversions are done
 	let delims = substitute(delims, "[({]", "b", "g") " convert ( to indicate start of indent
