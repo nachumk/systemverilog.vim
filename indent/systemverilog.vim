@@ -1,6 +1,6 @@
 "Author: Nachum Kanovsky
-"Email: nkanovsky yahoo com
-"Version: 1.9
+"Email: nkanovsky@yahoo.com
+"Version: 1.10
 "URL: https://github.com/nachumk/systemverilog.vim
 if exists("b:did_indent")
 	finish
