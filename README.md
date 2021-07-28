@@ -7,6 +7,7 @@ Pathogen Install
 ----------------
 
 Pathogen is supported by putting the systemverilog.vim folder under the bundle directory.
+
 https://github.com/tpope/vim-pathogen
 
 ### Install by cloning repository:
