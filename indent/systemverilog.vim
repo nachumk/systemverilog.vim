@@ -59,7 +59,7 @@ function! s:ConvertToCodes( codeline )
 	let delims = substitute(delims, "\\<\\(if\\|iff\\|else\\|assert\\|for\\|foreach\\|do\\|while\\|forever\\|repeat\\|always\\|always_comb\\|always_ff\\|always_latch\\|initial\\)\\>", "x", "g")
 	let delims = substitute(delims, "^\\s*\\/\\/.*$", "l", "g") " convert line comments and keep them b/c comments should not calculate new indent
 	let delims = substitute(delims, "\\/\\/.*", "", "g") " remove line comments after text (indentation based on text not comment)
-	let delims = substitute(delims, "\".\\{-}\"", "", "g") " remove strings
+	let delims = substitute(delims, "\".\\{-}\\(\\\\\\)\\@<!\"", "", "g") " remove strings
 	let delims = substitute(delims, "\\/\\*", "s", "g") " convert block comment start
 	let delims = substitute(delims, "\\*\\/", "p", "g") " convert block comment end
 	let delims = substitute(delims, "\\[[^:\\[\\]]*:[^:\\[\\]]*\\]", "", "g") "remove ranges
