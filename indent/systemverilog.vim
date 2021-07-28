@@ -1,6 +1,6 @@
 "Author: Nachum Kanovsky
 "Email: nkanovsky@yahoo.com
-"Version: 1.10
+"Version: 1.11
 "URL: https://github.com/nachumk/systemverilog.vim
 if exists("b:did_indent")
 	finish
@@ -49,12 +49,6 @@ function! s:ConvertToCodes( codeline )
 	let delims = substitute(delims, 'assert\s\+property', '', 'g') " remove assert property
 	let delims = substitute(delims, 'assume\s\+property', '', 'g') " remove assume property
 	let delims = substitute(delims, 'cover\s\+property', '', 'g') " remove cover property
-	let delims = substitute(delims, "^\\s*\\/\\/.*$", "l", "g") " convert line comments and keep them b/c comments should not calculate new indent
-	let delims = substitute(delims, "\\/\\/.*", "", "g") " remove line comments after text (indentation based on text not comment)
-	let delims = substitute(delims, "\".*\"", "", "g") " remove strings
-	let delims = substitute(delims, "\\/\\*", "s", "g") " convert block comment start
-	let delims = substitute(delims, "\\*\\/", "p", "g") " convert block comment end
-	let delims = substitute(delims, "\\[[^:\\[\\]]*:[^:\\[\\]]*\\]", "", "g") "remove ranges
 	let delims = substitute(delims, "\\(`\\<if\\>\\|`\\<ifdef\\>\\|`\\<ifndef\\>\\)", "b", "g")
 	let delims = substitute(delims, "\\(`\\<endif\\>\\)", "e", "g")
 	let delims = substitute(delims, "\\(`\\<else\\>\\)", "eb", "g")
@@ -63,6 +57,12 @@ function! s:ConvertToCodes( codeline )
 	let delims = substitute(delims, "\\<\\(class\\|config\\|clocking\\|function\\|task\\|specify\\|covergroup\\|property\\|sequence\\|checker\\)\\>", "f", "g")
 	let delims = substitute(delims, "\\<\\(endclass\\|endconfig\\|endclocking\\|endfunction\\|endtask\\|endspecify\\|endgroup\\|endproperty\\|endsequence\\|endchecker\\)\\>", "h", "g")
 	let delims = substitute(delims, "\\<\\(if\\|iff\\|else\\|assert\\|for\\|foreach\\|do\\|while\\|forever\\|repeat\\|always\\|always_comb\\|always_ff\\|always_latch\\|initial\\)\\>", "x", "g")
+	let delims = substitute(delims, "^\\s*\\/\\/.*$", "l", "g") " convert line comments and keep them b/c comments should not calculate new indent
+	let delims = substitute(delims, "\\/\\/.*", "", "g") " remove line comments after text (indentation based on text not comment)
+	let delims = substitute(delims, "\".*\"", "", "g") " remove strings
+	let delims = substitute(delims, "\\/\\*", "s", "g") " convert block comment start
+	let delims = substitute(delims, "\\*\\/", "p", "g") " convert block comment end
+	let delims = substitute(delims, "\\[[^:\\[\\]]*:[^:\\[\\]]*\\]", "", "g") "remove ranges
 	let delims = substitute(delims, "\@", "x", "g")
 	" convert (, ), only after whole word conversions are done
 	let delims = substitute(delims, "[({]", "b", "g") " convert ( to indicate start of indent
