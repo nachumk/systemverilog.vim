@@ -13,7 +13,7 @@ Install by cloning repository:
 
 VIM 7 doesn't have a native package management system. Using pathogen is recommended.
 
-Pathogen Install
+Pathogen Install (will enable VIM 8's directory structure of 'pack' instead of 'bundle' in VIM 7 - make sure Pathogen is updated as well)
 
 https://github.com/tpope/vim-pathogen
 
