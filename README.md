@@ -34,7 +34,7 @@ Install by cloning repository:
     "Enable filetype detection
     filetype plugin indent on
     "Enable folding based on indent (on 8.0 and greater versions)
-    if v:version > 800
+    if v:version >= 800
         set foldmethod=indent
         set foldnestmax=10
         set nofoldenable
