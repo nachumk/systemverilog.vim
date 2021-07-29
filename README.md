@@ -24,8 +24,10 @@ My .vimrc:
     syntax on
     "Enable filetype detection
     filetype plugin indent on
-    "Enable folding based on indent
-    set foldmethod=indent
-    set foldnestmax=10
-    set nofoldenable
-    set foldlevelstart=10
+    "Enable folding based on indent (on 8.0 and greater versions)
+    if v:version > 800
+        set foldmethod=indent
+        set foldnestmax=10
+        set nofoldenable
+        set foldlevelstart=10
+    endif
