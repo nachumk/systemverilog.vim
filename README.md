@@ -3,18 +3,25 @@ systemverilog.vim
 
 SystemVerilog indent and syntax scripts
 
-Pathogen Install
-----------------
+### VIM 8 Install:
 
-Pathogen is supported by putting the systemverilog.vim folder under the bundle directory.
+Install by cloning repository:
+
+    git clone git://github.com/nachumk/systemverilog.vim ~/.vim/pack/systemverilog.vim
+
+### VIM 7 Install:
+
+VIM 7 doesn't have a native package management system. Using pathogen is recommended.
+
+Pathogen Install
 
 https://github.com/tpope/vim-pathogen
 
-### Install by cloning repository:
+Install by cloning repository:
 
     git clone git://github.com/nachumk/systemverilog.vim ~/.vim/bundle/systemverilog.vim
 
-My .vimrc:
+### My .vimrc:
 
     "Enable matchit
     runtime macros/matchit.vim
