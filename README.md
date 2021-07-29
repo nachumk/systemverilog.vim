@@ -25,8 +25,10 @@ Install by cloning repository:
 
     "Enable matchit
     runtime macros/matchit.vim
-    "Start pathogen
-    execute pathogen#infect()
+    if v:version < 800
+        "Start pathogen
+        execute pathogen#infect()
+    endif
     "Turn on syntax highlighting
     syntax on
     "Enable filetype detection
