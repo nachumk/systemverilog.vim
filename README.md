@@ -19,7 +19,7 @@ https://github.com/tpope/vim-pathogen
 
 Install by cloning repository:
 
-    git clone git://github.com/nachumk/systemverilog.vim ~/.vim/bundle/systemverilog.vim
+    git clone git://github.com/nachumk/systemverilog.vim ~/.vim/pack/systemverilog.vim
 
 ### My .vimrc:
 
