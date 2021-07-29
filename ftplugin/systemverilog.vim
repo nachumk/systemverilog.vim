@@ -1,6 +1,6 @@
 "Author: Nachum Kanovsky
 "Email: nkanovsky@yahoo.com
-"Version: 1.11
+"Version: 1.11.3
 if exists("b:did_ftplugin")
 	finish
 endif
@@ -15,7 +15,7 @@ if exists("loaded_matchit")
   let b:match_ignorecase=0
   let b:match_words=
         \ '\<begin\>:\<end\>,' .
-        \ '\<if\>\|\<assert\>:\<else\>,' .
+        \ '\<if\>\|\<assert\>:\(`\s*\)\@<!else\>,' .
         \ '\<module\>:\<endmodule\>,' .
         \ '\<class\>:\<endclass\>,' .
         \ '\<program\>:\<endprogram\>,' .
@@ -32,6 +32,6 @@ if exists("loaded_matchit")
         \ '\<task\>:\<endtask\>,' .
         \ '\<case\>\|\<casex\>\|\<casez\>:\<endcase\>,' .
         \ '\<\(\(disable\|wait\)\s\+\)\@<!fork\>:\<join\>\|\<join_any\>\|\<join_none\>,' .
-        \ '`ifdef\>:`else\>:`endif\>,' .
+        \ '\<ifdef\>:\(`\s*\)\@<=else\>:\<endif\>,' .
         \ '\<generate\>:\<endgenerate\>'
 endif
