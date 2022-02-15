@@ -1,6 +1,6 @@
 "Author: Nachum Kanovsky
 "Email: nkanovsky@yahoo.com
-"Version: 1.12
+"Version: 1.13
 "URL: https://github.com/nachumk/systemverilog.vim
 if exists("b:did_indent")
 	finish
@@ -10,7 +10,7 @@ let b:did_indent = 1
 
 setlocal indentexpr=GetSystemVerilogIndent(v:lnum)
 setlocal indentkeys&
-setlocal indentkeys+==begin,=case,=if,=fork,=else,=end,=join,(,),{,},;
+setlocal indentkeys+==end,=join,(,),{,},=`begin_keywords,=`celldefine,=`default_nettype,=`define,=`end_keywords,=`endcelldefine,=`endif,=`ifdef,=`ifndef,=`include,=`nounconnected_drive,=`pragma,=`resetall,=`timescale,=`unconnected_drive,=`undef,=`undefineall;
 
 if exists("*GetSystemVerilogIndent")
 	finish
@@ -25,6 +25,7 @@ let s:BLOCK_INDENT_START = 'b'
 let s:BLOCK_INDENT_STOP = 'e'
 let s:LINE_INDENT = '^.*x$'
 let s:EXEC_LINE = '^.*;$'
+let s:PREPROCESSOR = '^z.*$'
 
 "b - 'begin', '(', '{'
 "e - 'end', ')', '{'
@@ -37,7 +38,7 @@ let s:EXEC_LINE = '^.*;$'
 function! s:ConvertToCodes( codeline )
 	" keywords that don't affect indent: module endmodule package endpackage interface endinterface
 	let delims = substitute(a:codeline, '\<virtual\>', '', 'g') " remove keyword virtual - helps for pure <virtual> function/task
-	let delims = substitute(a:codeline, "\\<\\(\\%(initial\\|always\\|always_comb\\|always_ff\\|always_latch\\|final\\|begin\\|disable\\|if\\|iff\\|extern\\|for\\|foreach\\|do\\|while\\|forever\\|repeat\\|randcase\\|case\\|casex\\|casez\\|wait\\|fork\\|ifdef\\|ifndef\\|else\\|end\\|endif\\|endcase\\|join\\|join_any\\|join_none\\|class\\|config\\|clocking\\|function\\|task\\|specify\\|covergroup\\|pure\\|endclass\\|endconfig\\|endclocking\\|endfunction\\|endtask\\|endspecify\\|endgroup\\|assume\\|assert\\|cover\\|property\\|typedef\\|endproperty\\|sequence\\|checker\\|endsequence\\|endchecker\\)\\>\\)\\@!\\k\\+", "", "g")
+	let delims = substitute(a:codeline, '\<\(\%(initial\|always\|always_comb\|always_ff\|always_latch\|final\|begin\|disable\|if\|iff\|extern\|for\|foreach\|do\|while\|forever\|repeat\|randcase\|case\|casex\|casez\|wait\|fork\|ifdef\|ifndef\|else\|end\|endif\|begin_keywords\|celldefine\|default_nettype\|define\|end_keywords\|endcelldefine\|include\|nounconnected_drive\|pragma\|resetall\|timescale\|unconnected_drive\|undef\|undefineall\|endcase\|join\|join_any\|join_none\|class\|config\|clocking\|function\|task\|specify\|covergroup\|pure\|endclass\|endconfig\|endclocking\|endfunction\|endtask\|endspecify\|endgroup\|assume\|assert\|cover\|property\|typedef\|endproperty\|sequence\|checker\|endsequence\|endchecker\)\>\)\@!\k\+', '', 'g')
 	let delims = substitute(delims, 'wait\s\+fork', '', 'g') " remove wait fork
 	let delims = substitute(delims, 'disable\s\+fork', '', 'g') " remove disable fork
 	let delims = substitute(delims, 'pure\s\+function', '', 'g') " remove pure function
@@ -49,39 +50,37 @@ function! s:ConvertToCodes( codeline )
 	let delims = substitute(delims, 'assert\s\+property', '', 'g') " remove assert property
 	let delims = substitute(delims, 'assume\s\+property', '', 'g') " remove assume property
 	let delims = substitute(delims, 'cover\s\+property', '', 'g') " remove cover property
-	let delims = substitute(delims, "\\(`\\<if\\>\\|`\\<ifdef\\>\\|`\\<ifndef\\>\\)", "b", "g")
-	let delims = substitute(delims, "\\(`\\<endif\\>\\)", "e", "g")
-	let delims = substitute(delims, "\\(`\\<else\\>\\)", "eb", "g")
-	let delims = substitute(delims, "\\<\\(begin\\|randcase\\|case\\|casex\\|casez\\|fork\\)\\>", "b", "g")
-	let delims = substitute(delims, "\\<\\(end\\|endcase\\|join\\|join_any\\|join_none\\)\\>", "e", "g")
-	let delims = substitute(delims, "\\<\\(class\\|config\\|clocking\\|function\\|task\\|specify\\|covergroup\\|property\\|sequence\\|checker\\)\\>", "f", "g")
-	let delims = substitute(delims, "\\<\\(endclass\\|endconfig\\|endclocking\\|endfunction\\|endtask\\|endspecify\\|endgroup\\|endproperty\\|endsequence\\|endchecker\\)\\>", "h", "g")
-	let delims = substitute(delims, "\\<\\(if\\|iff\\|else\\|assert\\|for\\|foreach\\|do\\|while\\|forever\\|repeat\\|always\\|always_comb\\|always_ff\\|always_latch\\|initial\\)\\>", "x", "g")
-	let delims = substitute(delims, "^\\s*\\/\\/.*$", "l", "g") " convert line comments and keep them b/c comments should not calculate new indent
-	let delims = substitute(delims, "\\/\\/.*", "", "g") " remove line comments after text (indentation based on text not comment)
-	let delims = substitute(delims, "\".\\{-}\\(\\\\\\)\\@<!\"", "", "g") " remove strings
-	let delims = substitute(delims, "\\/\\*", "s", "g") " convert block comment start
-	let delims = substitute(delims, "\\*\\/", "p", "g") " convert block comment end
-	let delims = substitute(delims, "\\[[^:\\[\\]]*:[^:\\[\\]]*\\]", "", "g") "remove ranges
-	let delims = substitute(delims, "\@", "x", "g")
+    let delims = substitute(delims, '`\s*\<\(begin_keywords\|celldefine\|default_nettype\|define\|else\|end_keywords\|endcelldefine\|endif\|ifdef\|ifndef\|include\|nounconnected_drive\|pragma\|resetall\|timescale\|unconnected_drive\|undef\|undefineall\)\>', 'z', 'g')
+	let delims = substitute(delims, '\<\(begin\|randcase\|case\|casex\|casez\|fork\)\>', 'b', 'g')
+	let delims = substitute(delims, '\<\(end\|endcase\|join\|join_any\|join_none\)\>', 'e', 'g')
+	let delims = substitute(delims, '\<\(class\|config\|clocking\|function\|task\|specify\|covergroup\|property\|sequence\|checker\)\>', 'f', 'g')
+	let delims = substitute(delims, '\<\(endclass\|endconfig\|endclocking\|endfunction\|endtask\|endspecify\|endgroup\|endproperty\|endsequence\|endchecker\)\>', 'h', 'g')
+	let delims = substitute(delims, '\<\(if\|iff\|else\|assert\|for\|foreach\|do\|while\|forever\|repeat\|always\|always_comb\|always_ff\|always_latch\|initial\)\>', 'x', 'g')
+	let delims = substitute(delims, '^\s*\/\/.*$', 'l', 'g') " convert line comments and keep them b/c comments should not calculate new indent
+	let delims = substitute(delims, '\/\/.*', '', 'g') " remove line comments after text (indentation based on text not comment)
+	let delims = substitute(delims, '\".\{-}\(\\\)\@<!\"', '', 'g') " remove strings
+	let delims = substitute(delims, '\/\*', 's', 'g') " convert block comment start
+	let delims = substitute(delims, '\*\/', 'p', 'g') " convert block comment end
+	let delims = substitute(delims, '\[[^:\[\]]*:[^:\[\]]*\]', '', 'g') "remove ranges
+	let delims = substitute(delims, '\@', 'x', 'g')
 	" convert (, ), only after whole word conversions are done
-	let delims = substitute(delims, "[({]", "b", "g") " convert ( to indicate start of indent
-	let delims = substitute(delims, "[)}]", "e", "g") " convert ) to indicate end of indent
-	let delims = substitute(delims, "^\s*`.*", "", "g") " remove other preprocessor commands
-	let delims = substitute(delims, "[/@<=#,.]*", "", "g") "remove extraneous characters
-	let delims = substitute(delims, "\\s", "", "g") " remove whitespace
-	let delims = substitute(delims, "^o\+:", "x", "g") " convert case branch (first on line)
-	let delims = substitute(delims, ":", "", "g") " remove labels
-	let delims = substitute(delims, "x\\+", "x", "g") " consolidate x
-	let delims = substitute(delims, "o\\+", "o", "g") " consolidate o
-	while (match(delims, "\\(b[^be]*e\\)") != -1)
-		let delims = substitute(delims, "\\(b[^be]*e\\)", "", "g") "remove any begin end pairs
+	let delims = substitute(delims, '[({]', 'b', 'g') " convert ( to indicate start of indent
+	let delims = substitute(delims, '[)}]', 'e', 'g') " convert ) to indicate end of indent
+	let delims = substitute(delims, '^\s*`.*', '', 'g') " remove other preprocessor commands
+	let delims = substitute(delims, '[/@<=#,.]*', '', 'g') "remove extraneous characters
+	let delims = substitute(delims, '\s', '', 'g') " remove whitespace
+	let delims = substitute(delims, '^o\+:', 'x', 'g') " convert case branch (first on line)
+	let delims = substitute(delims, ':', '', 'g') " remove labels
+	let delims = substitute(delims, 'x\+', 'x', 'g') " consolidate x
+	let delims = substitute(delims, 'o\+', 'o', 'g') " consolidate o
+	while (match(delims, '\(b[^be]*e\)') != -1)
+		let delims = substitute(delims, '\(b[^be]*e\)', '', 'g') "remove any begin end pairs
 	endwhile
-	while (match(delims, "\\(f[^fh]*h\\)") != -1)
-		let delims = substitute(delims, "\\(f[^fh]*h\\)", "", "g") "remove any function endfunction pairs
+	while (match(delims, '\(f[^fh]*h\)') != -1)
+		let delims = substitute(delims, '\(f[^fh]*h\)', '', 'g') "remove any function endfunction pairs
 	endwhile
-	while (match(delims, "\\(s[^sp]*p\\)") != -1)
-		let delims = substitute(delims, "\\(s[^sp]*p\\)", "", "g") "remove any comment start stop pairs
+	while (match(delims, '\(s[^sp]*p\)') != -1)
+		let delims = substitute(delims, '\(s[^sp]*p\)', '', 'g') "remove any comment start stop pairs
 	endwhile
 	return delims
 endfunction
@@ -90,7 +89,7 @@ function! s:GetPrevWholeLineNum ( line_num )
 	let prev1_line_num = prevnonblank( a:line_num - 1)
 	let prev2_line_num = prev1_line_num - 1
 	let prev2_codeline = getline( prev2_line_num )
-	while ( strpart( prev2_codeline , strlen(prev2_codeline) - 1 , 1) == "\\" )
+	while ( strpart( prev2_codeline , strlen(prev2_codeline) - 1 , 1) == '\' )
 		let prev1_line_num = prev1_line_num - 1
 		let prev2_line_num = prev1_line_num - 1
 		let prev2_codeline = getline( prev2_line_num )
@@ -102,7 +101,7 @@ endfunction
 function! s:GetWholeLine ( line_num )
 	let line_num = a:line_num
 	let codeline = getline( line_num )
-	while ( strpart( codeline , strlen(codeline) - 1 , 1) == "\\" )
+	while ( strpart( codeline , strlen(codeline) - 1 , 1) == '\' )
 		let line_num = line_num + 1
 		let codeline = strpart( codeline , 0 , strlen( codeline ) - 2 ) . " " . getline (line_num)
 	endwhile
@@ -158,14 +157,14 @@ function! GetSystemVerilogIndent( line_num )
 	let indnt = indent( prev1_line_num )
 
 	" Check for line continuations ( line ends with backslash )
-	if ( strpart( prev1_codeline , strlen(prev1_codeline) - 1 , 1) == "\\" )
-		if ( strpart( prev2_codeline , strlen(prev2_codeline) - 1 , 1) == "\\" )
+	if ( strpart( prev1_codeline , strlen(prev1_codeline) - 1 , 1) == '\' )
+		if ( strpart( prev2_codeline , strlen(prev2_codeline) - 1 , 1) == '\' )
 			return indnt
 		else
 			return indnt + &shiftwidth
 		endif
 	else
-		if ( strpart( prev2_codeline , strlen(prev2_codeline) - 1 , 1) == "\\" )
+		if ( strpart( prev2_codeline , strlen(prev2_codeline) - 1 , 1) == '\' )
 			let indnt = indnt - &shiftwidth
 		endif
 	endif
@@ -175,7 +174,7 @@ function! GetSystemVerilogIndent( line_num )
 	let prev1_codeline = s:GetWholeLine (prev1_line_num)
 	let prev1_codes = s:ConvertToCodes(prev1_codeline)
 	let in_comment = 0
-	while ( prev1_codes =~ s:LINE_COMMENT || in_comment || prev1_codes =~ s:BLOCK_COMMENT_STOP || prev1_codes =~ s:BLOCK_COMMENT_START)
+	while ( prev1_codes =~ s:LINE_COMMENT || in_comment || prev1_codes =~ s:BLOCK_COMMENT_STOP || prev1_codes =~ s:BLOCK_COMMENT_START || prev1_codes =~ s:PREPROCESSOR)
 		if (prev1_codes =~ s:BLOCK_COMMENT_STOP)
 			let in_comment = 1
 		endif
@@ -191,7 +190,7 @@ function! GetSystemVerilogIndent( line_num )
 	let prev2_codeline = s:GetWholeLine (prev2_line_num)
 	let prev2_codes = s:ConvertToCodes(prev2_codeline)
 	let in_comment = 0
-	while ( prev2_codes =~ s:LINE_COMMENT || in_comment || prev2_codes =~ s:BLOCK_COMMENT_STOP || prev2_codes =~ s:BLOCK_COMMENT_START)
+	while ( prev2_codes =~ s:LINE_COMMENT || in_comment || prev2_codes =~ s:BLOCK_COMMENT_STOP || prev2_codes =~ s:BLOCK_COMMENT_START || prev2_codes =~ s:PREPROCESSOR)
 		if (prev2_codes =~ s:BLOCK_COMMENT_STOP)
 			let in_comment = 1
 		endif
@@ -227,6 +226,9 @@ function! GetSystemVerilogIndent( line_num )
 		return indent (a:line_num) + b:extra_block_indent
 	endif
 
+	if (this_codes =~ s:PREPROCESSOR)
+		return 0
+	endif
 	if (this_codes =~ s:LINE_COMMENT)
 		return indnt
 	endif
