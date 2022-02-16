@@ -30,10 +30,12 @@ let s:PREPROCESSOR = '^z.*$'
 "================================================================================
 "ryanHack
 "let s:CONDITIONAL = '?.*:.*$'
-let s:CONDITIONAL = '?[^?]*:[^?]*$'
+"let s:CONDITIONAL = '?[^?]*:[^?]*$'
+let s:CONDITIONAL = '?[^?]*:[^?]*[^;]\s*$'  | " Fix the case that ternary operator finished in one line
 "let s:CONDITIONAL = 'c'
 "c - '?' -- conditional operator
 "================================================================================
+
 
 "b - 'begin', '(', '{'
 "e - 'end', ')', '{'
