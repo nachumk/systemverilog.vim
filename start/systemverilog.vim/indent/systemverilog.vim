@@ -30,8 +30,7 @@ let s:PREPROCESSOR = '^z.*$'
 "================================================================================
 "ryanHack
 "let s:CONDITIONAL = '?.*:.*$'
-"let s:CONDITIONAL = '?[^?]*:[^?]*$'
-let s:CONDITIONAL = '?[^?]*:[^?]*[^;]\s*$'  | " Fix the case that ternary operator finished in one line
+let s:CONDITIONAL = '?[^?]*:[^?]*$'
 "let s:CONDITIONAL = 'c'
 "c - '?' -- conditional operator
 "================================================================================
@@ -225,19 +224,24 @@ function! GetSystemVerilogIndent( line_num )
             "let l:conditional_indent= strlen(substitute(prev1_codeline, '\(?\)\([^?]*\)', '\1', ""))                   | " return the position at ?
             "let l:conditional_indent= strlen(substitute(prev1_codeline, '\(?\s*\)\([^?]*\)', '\1', ""))                | " return the position at the word after the ?
 
-            if prev1_codeline =~ '[^=]=[^=]'
-                let l:conditional_indent= strlen(substitute(prev1_codeline, '\(.*[^=]=\s\+\)\([^=].*\)', '\1', ""))     | " return the position at the word after the =
+            if prev1_codeline  =~ ';'
+                "Do nothing
             else
-                let l:conditional_indent= strlen(substitute(prev1_codeline, '\(?\s*\)\([^?]*\)', '\1', ""))             | " return the position at the word after the ?
-            endif
+                if prev1_codeline =~ '[^=]=[^=]'
+                    let l:conditional_indent= strlen(substitute(prev1_codeline, '\(.*[^=]=\s\+\)\([^=].*\)', '\1', ""))     | " return the position at the word after the =
+                else
+                    let l:conditional_indent= strlen(substitute(prev1_codeline, '\(?\s*\)\([^?]*\)', '\1', ""))             | " return the position at the word after the ?
+                endif
 
-            let indnt = l:conditional_indent
-            return indnt
-        else
-            let indnt = s:GetCodeIndent ( indnt, prev2_codes, prev1_codes, this_codes)
+                let indnt = l:conditional_indent
+                return indnt
+            endif
         endif
+        
+        let indnt = s:GetCodeIndent ( indnt, prev2_codes, prev1_codes, this_codes)
+        
         "================================================================================
-        "
+
 	if this_codes =~ s:BLOCK_COMMENT_STOP || b:block_comment_change != b:changedtick || b:block_comment_line != prev1_for_comment_line
 		let b:in_block_comment = 0
 	endif
