@@ -1,61 +1,290 @@
 "Author: Nachum Kanovsky
 "Email: nkanovsky@yahoo.com
 "Version: 1.13
-if exists("b:current_syntax")
+"Revised: Modified by Ryan Wu on 2022_0216  (Add support for ternary indentation)
+"Revised: Modified by Ryan Wu on 2022_0310  (Update ternary indentation: Always return the position at the word after the =)
+"URL: https://github.com/nachumk/systemverilog.vim
+if exists("b:did_indent")
 	finish
 endif
 
-let b:current_syntax = "systemverilog"
+let b:did_indent = 1
 
-syntax keyword svTodo TODO contained
-syntax match svLineComment "//.*" contains=svTodo
-syntax region svBlockComment start="/\*" end="\*/" contains=svTodo
-syntax region svString start=+"+ skip=+\\"+ end=+"+
-syntax keyword svType real realtime event reg wire integer logic bit time byte chandle genvar signed unsigned shortint shortreal string void int specparam
-syntax keyword svDirection input output inout ref
-syntax keyword svStorageClass virtual var protected rand const static automatic extern forkjoin export import
-syntax match svPreProc "`\(__FILE__\|__LINE__\|begin_keywords\|celldefine\|default_nettype\|end_keywords\|endcelldefine\|include\|line\|nounconnected_drive\|pragma\|resetall\|timescale\|unconnected_drive\|undef\|undefineall\)\>"
-syntax match svPreCondit "`\(else\|elsif\|endif\|ifdef\|ifndef\)\>"
-syntax match svInclude "`include\>"
-syntax match svDefine "`define\>"
-syntax keyword svConditional if else iff case casez casex endcase
-syntax keyword svRepeat for foreach do while forever repeat
-syntax keyword svKeyword fork join join_any join_none begin end module endmodule function endfunction task endtask always always_ff always_latch always_comb initial this generate endgenerate config endconfig class endclass clocking endclocking interface endinterface package endpackage modport posedge negedge edge defparam assign deassign alias return disable wait continue and buf bufif0 bufif1 nand nor not or xnor xor tri tri0 tri1 triand trior trireg pull0 pull1 pullup pulldown cmos default endprimitive endspecify endtable force highz0 highz1 ifnone large macromodule medium nmos notif0 notif1 pmos primitive rcmos release rnmos rpmos rtran rtranif0 rtranif1 scalared small specify strong0 strong1 supply0 supply1 table tran tranif0 tranif1 vectored wand weak0 weak1 wor cell design incdir liblist library noshowcancelled pulsestyle_ondetect pulsestyle_onevent showcancelled use instance uwire assert assume before bind bins binsof break constraint context cover covergroup coverpoint cross dist endgroup endprogram endproperty endsequence expect extends final first_match ignore_bins illegal_bins inside intersect local longint matches new null packed priority program property pure randc randcase randsequence sequence solve super tagged throughout timeprecision timeunit type unique wait_order wildcard with within accept_on checker endchecker eventually global implies let nexttime reject_on restrict s_always s_eventually s_nexttime s_until s_until_with strong sync_accept_on sync_reject_on unique0 until until_with untyped weak implements interconnect nettype soft
-syntax match svInteger "\<\(\.\)\@<![0-9_]\+\(\s*['.]\)\@!\>"
-syntax match svInteger "\(\<[0-9_]\+\s*\)\?'\(s\|S\)\?\(d\|D\)\s*[0-9_ZzXx?]\+"
-syntax match svInteger "\(\<[0-9_]\+\s*\)\?'\(s\|S\)\?\(h\|H\)\s*[0-9a-fA-F_ZzXx?]\+"
-syntax match svInteger "\(\<[0-9_]\+\s*\)\?'\(s\|S\)\?\(o\|O\)\s*[0-7_ZzXx?]\+"
-syntax match svInteger "\(\<[0-9_]\+\s*\)\?'\(s\|S\)\?\(b\|B\)\s*[01_ZzXx?]\+"
-syntax match svInteger "\<'\(d\|D\|h\|H\|o\|O\|b\|B\)\>"
-syntax match svInteger "'[01xXzZ?]\>"
-syntax match svReal "\<[0-9_]\+\.[0-9_]\+\(\(e\|E\)[+-]\?[0-9_]\+\)\?\>"
-syntax match svReal "\<[0-9_]\+\(e\|E\)[+-]\?[0-9_]\+\>"
-syntax keyword svStructure struct union enum
-syntax keyword svTypedef typedef parameter localparam
-syntax match svSystemFunction "\$\(display\|displayb\|displayo\|displayh\|write\|writeb\|writeo\|writeh\|strobe\|strobeb\|strobeh\|strobeo\|monitor\|monitorb\|monitorh\|monitoro\|fopen\|fclose\|ftell\|fseek\|rewind\|fdisplay\|fdisplayb\|fdisplayh\|fdisplayo\|fwrite\|fwriteb\|fwriteh\|fwriteo\|fstrobe\|fstrobeb\|fstrobeh\|fstrobeo\|fmonitor\|fmonitorb\|fmonitorh\|fmonitoro\|finish\|stop\|exit\|realtime\|stime\|time\|printtimescale\|timeformat\|bitstoreal\|realtobits\|bitstoshortreal\|shortrealtobits\|itor\|rtoi\|signed\|unsigned\|cast\|bits\|isunbounded\|typename\|unpacked_dimensions\|dimensions\|left\|right\|low\|high\|increment\|size\|clog2\|asin\|ln\|acos\|log10\|atan\|exp\|atan2\|sqrt\|hypot\|pow\|sinh\|floor\|cosh\|ceil\|tanh\|sin\|asinh\|cos\|acosh\|tan\|atanh\|countbits\|countones\|onehot\|onehot0\|isunknown\|fatal\|error\|warning\|info\|fatal\|error\|warning\|info\|asserton\|assertoff\|assertkill\|assertcontrol\|assertpasson\|assertpassoff\|assertfailon\|assertfailoff\|assertnonvacuouson\|assertvacuousoff\|sampled\|rose\|fell\|stable\|changed\|past\|past_gclk\|rose_gclk\|fell_gclk\|stable_gclk\|changed_gclk\|future_gclk\|rising_gclk\|falling_gclk\|steady_gclk\|changing_gclk\|coverage_control\|coverage_get_max\|coverage_get\|coverage_merge\|coverage_save\|get_coverage\|set_coverage_db_name\|load_coverage_db\|random\|urandom\|urandom_range\|dist_chi_square\|dist_erlang\|dist_exponential\|dist_normal\|dist_poisson\|dist_t\|dist_uniform\|q_initialize\|q_add\|q_remove\|q_full\|q_exam\|asyncandarray\|asyncandplane\|asyncnandarray\|asyncnandplane\|asyncorarray\|asyncorplane\|asyncnorarray\|asyncnorplane\|syncandarray\|syncandplane\|syncnandarray\|syncnandplane\|syncorarray\|syncorplane\|syncnorarray\|syncnorplane\|system\|contained\|transparent\|dumpfile\|dumpvars\|dumpon\|dumpoff\|dumpall\|dumplimit\|dumpflush\|readmemb\|readmemh\|writememb\|writememh\)\>"
-syntax match svObjectFunctions "\.\(num\|size\|delete\|exists\|first\|last\|next\|prev\|insert\|pop_front\|pop_back\|push_front\|push_back\|find\|find_index\|find_first\|find_first_index\|find_last\|find_last_index\|min\|max\|reverse\|sort\|rsort\|shuffle\|sum\|product\|and\|or\|xor\)\>\(\s\|\n\)*("he=e-1
-syntax match svOperator "\(\~\|&\||\|\^\|=\|!\|?\|:\|@\|<\|>\|%\|+\|-\|\*\|\/[\/\*]\@!\)"
-syntax match svDelimiter "\({\|}\|(\|)\)"
+setlocal indentexpr=GetSystemVerilogIndent(v:lnum)
+setlocal indentkeys&
+setlocal indentkeys+==end,=join,(,),{,},=`begin_keywords,=`celldefine,=`default_nettype,=`define,=`end_keywords,=`endcelldefine,=`endif,=`ifdef,=`ifndef,=`include,=`nounconnected_drive,=`pragma,=`resetall,=`timescale,=`unconnected_drive,=`undef,=`undefineall;
 
-highlight! default link svTodo Todo
-highlight! default link svLineComment Comment
-highlight! default link svBlockComment Comment
-highlight! default link svString String
-highlight! default link svType Type
-highlight! default link svDirection StorageClass
-highlight! default link svStorageClass StorageClass
-highlight! default link svPreProc PreProc
-highlight! default link svPreCondit PreCondit
-highlight! default link svInclude Include
-highlight! default link svDefine Define
-highlight! default link svConditional Conditional
-highlight! default link svRepeat Repeat
-highlight! default link svKeyword Keyword
-highlight! default link svInteger Number
-highlight! default link svReal Float
-highlight! default link svStructure Structure
-highlight! default link svTypedef Typedef
-highlight! default link svSystemFunction Function
-highlight! default link svOperator Operator
-highlight! default link svDelimiter Delimiter
-highlight! default link svObjectFunctions Function
+if exists("*GetSystemVerilogIndent")
+	finish
+endif
+
+let s:BLOCK_COMMENT_START = '^s.*$'
+let s:BLOCK_COMMENT_STOP = '^.*p$'
+let s:LINE_COMMENT = '^l$'
+let s:GROUP_INDENT_START = 'f'
+let s:GROUP_INDENT_STOP = 'h'
+let s:BLOCK_INDENT_START = 'b'
+let s:BLOCK_INDENT_STOP = 'e'
+let s:LINE_INDENT = '^.*x$'
+let s:EXEC_LINE = '^.*;$'
+let s:PREPROCESSOR = '^z.*$'
+"================================================================================
+"ryanHack
+"let s:CONDITIONAL_REGEX = '?.*:.*$'
+let s:CONDITIONAL_REGEX = '?[^?]*:[^?]*$'
+"--------------------
+let s:CONDITIONAL = 'c'
+"c - '?' -- conditional operator
+"================================================================================
+
+"b - 'begin', '(', '{'
+"e - 'end', ')', '{'
+"f - 'class', 'function', 'task'
+"h - 'endclass', 'endfunction', 'endtask'
+"l - '//' -- at start of line
+"s - '/*' -- start comment
+"p - '*/' -- stop comment
+"x - 'if', 'else', 'for', 'do, 'while', 'always', 'initial', -- execution commands
+function! s:ConvertToCodes( codeline )
+	" keywords that don't affect indent: module endmodule package endpackage interface endinterface
+	let delims = substitute(a:codeline, '\<virtual\>', '', 'g') " remove keyword virtual - helps for pure <virtual> function/task
+	let delims = substitute(a:codeline, '\<\(\%(initial\|always\|always_comb\|always_ff\|always_latch\|final\|begin\|disable\|if\|iff\|extern\|for\|foreach\|do\|while\|forever\|repeat\|randcase\|case\|casex\|casez\|wait\|fork\|ifdef\|ifndef\|else\|end\|endif\|begin_keywords\|celldefine\|default_nettype\|define\|end_keywords\|endcelldefine\|include\|nounconnected_drive\|pragma\|resetall\|timescale\|unconnected_drive\|undef\|undefineall\|endcase\|join\|join_any\|join_none\|class\|config\|clocking\|function\|task\|specify\|covergroup\|pure\|endclass\|endconfig\|endclocking\|endfunction\|endtask\|endspecify\|endgroup\|assume\|assert\|cover\|property\|typedef\|endproperty\|sequence\|checker\|endsequence\|endchecker\)\>\)\@!\k\+', '', 'g')
+	let delims = substitute(delims, 'wait\s\+fork', '', 'g') " remove wait fork
+	let delims = substitute(delims, 'disable\s\+fork', '', 'g') " remove disable fork
+	let delims = substitute(delims, 'pure\s\+function', '', 'g') " remove pure function
+	let delims = substitute(delims, 'extern\s\+function', '', 'g') " remove extern function
+	let delims = substitute(delims, 'pure\s\+task', '', 'g') " remove pure task
+	let delims = substitute(delims, 'extern\s\+task', '', 'g') " remove extern task
+	let delims = substitute(delims, 'typedef\s\+class', '', 'g') " remove typedef class
+	let delims = substitute(delims, 'typedef', '', 'g') " remove typedef
+	let delims = substitute(delims, 'assert\s\+property', '', 'g') " remove assert property
+	let delims = substitute(delims, 'assume\s\+property', '', 'g') " remove assume property
+	let delims = substitute(delims, 'cover\s\+property', '', 'g') " remove cover property
+    let delims = substitute(delims, '`\s*\<\(begin_keywords\|celldefine\|default_nettype\|define\|else\|end_keywords\|endcelldefine\|endif\|ifdef\|ifndef\|include\|nounconnected_drive\|pragma\|resetall\|timescale\|unconnected_drive\|undef\|undefineall\)\>', 'z', 'g')
+	let delims = substitute(delims, '\<\(begin\|randcase\|case\|casex\|casez\|fork\)\>', 'b', 'g')
+	let delims = substitute(delims, '\<\(end\|endcase\|join\|join_any\|join_none\)\>', 'e', 'g')
+	let delims = substitute(delims, '\<\(class\|config\|clocking\|function\|task\|specify\|covergroup\|property\|sequence\|checker\)\>', 'f', 'g')
+	let delims = substitute(delims, '\<\(endclass\|endconfig\|endclocking\|endfunction\|endtask\|endspecify\|endgroup\|endproperty\|endsequence\|endchecker\)\>', 'h', 'g')
+	let delims = substitute(delims, '\<\(if\|iff\|else\|assert\|for\|foreach\|do\|while\|forever\|repeat\|always\|always_comb\|always_ff\|always_latch\|initial\)\>', 'x', 'g')
+	let delims = substitute(delims, '^\s*\/\/.*$', 'l', 'g') " convert line comments and keep them b/c comments should not calculate new indent
+	let delims = substitute(delims, '\/\/.*', '', 'g') " remove line comments after text (indentation based on text not comment)
+	let delims = substitute(delims, '\".\{-}\(\\\)\@<!\"', '', 'g') " remove strings
+	let delims = substitute(delims, '\/\*', 's', 'g') " convert block comment start
+	let delims = substitute(delims, '\*\/', 'p', 'g') " convert block comment end
+	let delims = substitute(delims, '\[[^:\[\]]*:[^:\[\]]*\]', '', 'g') "remove ranges
+	let delims = substitute(delims, '\@', 'x', 'g')
+	" convert (, ), only after whole word conversions are done
+	let delims = substitute(delims, '[({]', 'b', 'g') " convert ( to indicate start of indent
+	let delims = substitute(delims, '[)}]', 'e', 'g') " convert ) to indicate end of indent
+	let delims = substitute(delims, '^\s*`.*', '', 'g') " remove other preprocessor commands
+	let delims = substitute(delims, '[/@<=#,.]*', '', 'g') "remove extraneous characters
+	let delims = substitute(delims, '\s', '', 'g') " remove whitespace
+	let delims = substitute(delims, '^o\+:', 'x', 'g') " convert case branch (first on line)
+        "================================================================================
+	"ryanHack let delims = substitute(delims, ":", "", "g") " remove labels
+	"let delims = substitute(delims, "?[^?]*:[^?]*$", "c", "g") " convert conditional operator
+	"let delims = substitute(delims, "?[^?]*", "c", "g") " convert conditional operator
+	let delims = substitute(delims, s:CONDITIONAL_REGEX, "c", "g") " convert conditional operator
+
+        "================================================================================
+	let delims = substitute(delims, 'x\+', 'x', 'g') " consolidate x
+	let delims = substitute(delims, 'o\+', 'o', 'g') " consolidate o
+	while (match(delims, '\(b[^be]*e\)') != -1)
+		let delims = substitute(delims, '\(b[^be]*e\)', '', 'g') "remove any begin end pairs
+	endwhile
+	while (match(delims, '\(f[^fh]*h\)') != -1)
+		let delims = substitute(delims, '\(f[^fh]*h\)', '', 'g') "remove any function endfunction pairs
+	endwhile
+	while (match(delims, '\(s[^sp]*p\)') != -1)
+		let delims = substitute(delims, '\(s[^sp]*p\)', '', 'g') "remove any comment start stop pairs
+	endwhile
+	return delims
+endfunction
+
+function! s:GetPrevWholeLineNum ( line_num )
+	let prev1_line_num = prevnonblank( a:line_num - 1)
+	let prev2_line_num = prev1_line_num - 1
+	let prev2_codeline = getline( prev2_line_num )
+	while ( strpart( prev2_codeline , strlen(prev2_codeline) - 1 , 1) == '\' )
+		let prev1_line_num = prev1_line_num - 1
+		let prev2_line_num = prev1_line_num - 1
+		let prev2_codeline = getline( prev2_line_num )
+	endwhile
+
+	return prev1_line_num
+endfunction
+
+function! s:GetWholeLine ( line_num )
+	let line_num = a:line_num
+	let codeline = getline( line_num )
+	while ( strpart( codeline , strlen(codeline) - 1 , 1) == '\' )
+		let line_num = line_num + 1
+		let codeline = strpart( codeline , 0 , strlen( codeline ) - 2 ) . " " . getline (line_num)
+	endwhile
+
+	return codeline
+endfunction
+
+function! s:GetCodeIndent ( indnt, prev2_codes, prev1_codes, this_codes )
+	let indnt = a:indnt
+	if a:prev2_codes =~ s:LINE_INDENT && a:prev1_codes =~ s:EXEC_LINE " used up single indent in previous line, return back to normal indent
+		let indnt = indnt - &shiftwidth
+	endif
+
+	if a:prev1_codes =~ s:GROUP_INDENT_START
+		let indnt = indnt + &shiftwidth
+	endif
+
+	if a:this_codes =~ s:GROUP_INDENT_STOP
+		return indnt - &shiftwidth
+	endif
+
+	if a:prev1_codes =~ s:BLOCK_INDENT_START
+		let indnt = indnt + &shiftwidth
+	endif
+	if a:this_codes =~ s:BLOCK_INDENT_STOP
+		return indnt - &shiftwidth
+	endif
+
+	if a:prev1_codes =~ s:LINE_INDENT
+		let indnt = indnt + &shiftwidth
+		if a:this_codes =~ s:LINE_INDENT || a:this_codes =~ s:BLOCK_INDENT_START
+			let indnt = indnt - &shiftwidth
+		endif
+	endif
+
+	return indnt
+endfunction
+
+let b:in_block_comment = 0
+
+"Intending to handle block comment by seeing /* and forward reading till end to find */ and then storing a buffer local variable indicating last line of block comment, and b:changedtick (change number which always increments). Using that variable I can ignore normal indentation until I get there.
+function! GetSystemVerilogIndent( line_num )
+	if a:line_num == 1
+		return 0
+	endif
+
+	let this_codeline = getline( a:line_num )
+	let prev1_line_num = prevnonblank( a:line_num - 1)
+	let prev1_codeline = getline( prev1_line_num )
+	let prev2_line_num = prev1_line_num - 1
+	let prev2_codeline = getline( prev2_line_num )
+
+	let indnt = indent( prev1_line_num )
+
+	" Check for line continuations ( line ends with backslash )
+	if ( strpart( prev1_codeline , strlen(prev1_codeline) - 1 , 1) == '\' )
+		if ( strpart( prev2_codeline , strlen(prev2_codeline) - 1 , 1) == '\' )
+			return indnt
+		else
+			return indnt + &shiftwidth
+		endif
+	else
+		if ( strpart( prev2_codeline , strlen(prev2_codeline) - 1 , 1) == '\' )
+			let indnt = indnt - &shiftwidth
+		endif
+	endif
+
+	let prev1_line_num = s:GetPrevWholeLineNum (a:line_num)
+	let prev1_for_comment_line = prev1_line_num
+	let prev1_codeline = s:GetWholeLine (prev1_line_num)
+	let prev1_codes = s:ConvertToCodes(prev1_codeline)
+	let in_comment = 0
+	while ( prev1_codes =~ s:LINE_COMMENT || in_comment || prev1_codes =~ s:BLOCK_COMMENT_STOP || prev1_codes =~ s:BLOCK_COMMENT_START || prev1_codes =~ s:PREPROCESSOR)
+		if (prev1_codes =~ s:BLOCK_COMMENT_STOP)
+			let in_comment = 1
+		endif
+		if (prev1_codes =~ s:BLOCK_COMMENT_START)
+			let in_comment = 0
+		endif
+		let prev1_line_num = s:GetPrevWholeLineNum (prev1_line_num)
+		let prev1_codeline = s:GetWholeLine (prev1_line_num)
+		let prev1_codes = s:ConvertToCodes(prev1_codeline)
+	endwhile
+
+	let prev2_line_num = s:GetPrevWholeLineNum (prev1_line_num)
+	let prev2_codeline = s:GetWholeLine (prev2_line_num)
+	let prev2_codes = s:ConvertToCodes(prev2_codeline)
+	let in_comment = 0
+	while ( prev2_codes =~ s:LINE_COMMENT || in_comment || prev2_codes =~ s:BLOCK_COMMENT_STOP || prev2_codes =~ s:BLOCK_COMMENT_START || prev2_codes =~ s:PREPROCESSOR)
+		if (prev2_codes =~ s:BLOCK_COMMENT_STOP)
+			let in_comment = 1
+		endif
+		if (prev2_codes =~ s:BLOCK_COMMENT_START)
+			let in_comment = 0
+		endif
+		let prev2_line_num = s:GetPrevWholeLineNum (prev2_line_num)
+		let prev2_codeline = s:GetWholeLine (prev2_line_num)
+		let prev2_codes = s:ConvertToCodes(prev2_codeline)
+	endwhile
+
+	let this_codes = s:ConvertToCodes( this_codeline )
+
+	let indnt = indent( prev1_line_num )
+        
+        "================================================================================
+        "ryanHack
+	"if prev1_codes =~ s:CONDITIONAL
+        if prev1_codeline =~ s:CONDITIONAL_REGEX
+            if prev1_codeline  =~ ';'
+                "Do nothing
+            else
+                if prev1_codeline =~ '[^=]=[^=]'
+                    let l:conditional_indent= strlen(substitute(prev1_codeline, '\(.*[^=]=\s\+\)\([^=].*\)', '\1', ""))     | " return the position at the word after the =
+                "RETIRED    else
+                "RETIRED        let l:conditional_indent= strlen(substitute(prev1_codeline, '\(?\s*\)\([^?]*\)', '\1', ""))             | " return the position at the word after the ?
+                endif
+
+                let indnt = l:conditional_indent
+                return indnt
+            endif
+        endif
+        "--------------------
+        if (prev2_codeline =~ s:CONDITIONAL_REGEX) && (prev2_codeline !~ ';')
+            if prev1_codeline =~ ';'
+                "REFERENCE  let conditional_initial_indent=strlen(substitute(prev1_codeline, '^\(\s*\)\S.*$', '\1', ""))
+                let l:conditional_head_lnum = line('.')
+                while (getline(l:conditional_head_lnum) !~ '[^=]=[^=]' && l:conditional_head_lnum > 1)
+                    let l:conditional_head_lnum -= 1
+                    "ryanDebug  echom "[2] WHILE " . line('.')
+                endwhile
+                let l:conditional_head_indent = indent(l:conditional_head_lnum)
+                "ryanDebug  echom "[2] HHHHHHHHHHHHH" . line('.')
+                "ryanDebug  echom "[2] conditional_head_lnum   is " . conditional_head_lnum
+                "ryanDebug  echom "[2] conditional_head_indent is " . conditional_head_indent
+                "ryanDebug  "let indnt = 30
+                let indnt = conditional_head_indent
+                return indnt
+            endif
+        endif
+        "================================================================================
+        
+	let indnt = s:GetCodeIndent ( indnt, prev2_codes, prev1_codes, this_codes)
+
+	if this_codes =~ s:BLOCK_COMMENT_STOP || b:block_comment_change != b:changedtick || b:block_comment_line != prev1_for_comment_line
+		let b:in_block_comment = 0
+	endif
+	if this_codes =~ s:BLOCK_COMMENT_STOP
+		return indent (a:line_num) + b:extra_block_indent
+	endif
+	if this_codes =~ s:BLOCK_COMMENT_START
+		let b:in_block_comment = 1
+		let b:block_comment_line = a:line_num
+		let b:block_comment_change = b:changedtick
+		let b:extra_block_indent = indnt - indent ( a:line_num )
+		return indnt
+	endif
+	if b:in_block_comment
+		let b:block_comment_line = a:line_num
+		return indent (a:line_num) + b:extra_block_indent
+	endif
+
+	if (this_codes =~ s:PREPROCESSOR)
+		return 0
+	endif
+	if (this_codes =~ s:LINE_COMMENT)
+		return indnt
+	endif
+
+	return indnt
+endfunction
