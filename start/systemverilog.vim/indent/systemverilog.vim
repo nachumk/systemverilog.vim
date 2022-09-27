@@ -1,6 +1,6 @@
 "Author: Nachum Kanovsky
 "Email: nkanovsky@yahoo.com
-"Version: 1.13
+"Version: 1.14
 "URL: https://github.com/nachumk/systemverilog.vim
 if exists("b:did_indent")
 	finish
@@ -38,7 +38,7 @@ let s:PREPROCESSOR = '^z.*$'
 function! s:ConvertToCodes( codeline )
 	" keywords that don't affect indent: module endmodule package endpackage interface endinterface
 	let delims = substitute(a:codeline, '\<virtual\>', '', 'g') " remove keyword virtual - helps for pure <virtual> function/task
-	let delims = substitute(a:codeline, '\<\(\%(initial\|always\|always_comb\|always_ff\|always_latch\|final\|begin\|disable\|if\|iff\|extern\|for\|foreach\|do\|while\|forever\|repeat\|randcase\|case\|casex\|casez\|wait\|fork\|ifdef\|ifndef\|else\|end\|endif\|begin_keywords\|celldefine\|default_nettype\|define\|end_keywords\|endcelldefine\|include\|nounconnected_drive\|pragma\|resetall\|timescale\|unconnected_drive\|undef\|undefineall\|endcase\|join\|join_any\|join_none\|class\|config\|clocking\|function\|task\|specify\|covergroup\|pure\|endclass\|endconfig\|endclocking\|endfunction\|endtask\|endspecify\|endgroup\|assume\|assert\|cover\|property\|typedef\|endproperty\|sequence\|checker\|endsequence\|endchecker\)\>\)\@!\k\+', '', 'g')
+	let delims = substitute(a:codeline, '\<\(\%(initial\|always\|always_comb\|always_ff\|always_latch\|final\|begin\|disable\|if\|extern\|for\|foreach\|do\|while\|forever\|repeat\|randcase\|case\|casex\|casez\|wait\|fork\|ifdef\|ifndef\|else\|end\|endif\|begin_keywords\|celldefine\|default_nettype\|define\|end_keywords\|endcelldefine\|include\|nounconnected_drive\|pragma\|resetall\|timescale\|unconnected_drive\|undef\|undefineall\|endcase\|join\|join_any\|join_none\|class\|config\|clocking\|function\|task\|specify\|covergroup\|pure\|endclass\|endconfig\|endclocking\|endfunction\|endtask\|endspecify\|endgroup\|assume\|assert\|cover\|property\|typedef\|endproperty\|sequence\|checker\|endsequence\|endchecker\)\>\)\@!\k\+', '', 'g')
 	let delims = substitute(delims, 'wait\s\+fork', '', 'g') " remove wait fork
 	let delims = substitute(delims, 'disable\s\+fork', '', 'g') " remove disable fork
 	let delims = substitute(delims, 'pure\s\+function', '', 'g') " remove pure function
@@ -55,7 +55,7 @@ function! s:ConvertToCodes( codeline )
 	let delims = substitute(delims, '\<\(end\|endcase\|join\|join_any\|join_none\)\>', 'e', 'g')
 	let delims = substitute(delims, '\<\(class\|config\|clocking\|function\|task\|specify\|covergroup\|property\|sequence\|checker\)\>', 'f', 'g')
 	let delims = substitute(delims, '\<\(endclass\|endconfig\|endclocking\|endfunction\|endtask\|endspecify\|endgroup\|endproperty\|endsequence\|endchecker\)\>', 'h', 'g')
-	let delims = substitute(delims, '\<\(if\|iff\|else\|assert\|for\|foreach\|do\|while\|forever\|repeat\|always\|always_comb\|always_ff\|always_latch\|initial\)\>', 'x', 'g')
+	let delims = substitute(delims, '\<\(if\|else\|assert\|for\|foreach\|do\|while\|forever\|repeat\|always\|always_comb\|always_ff\|always_latch\|initial\)\>', 'x', 'g')
 	let delims = substitute(delims, '^\s*\/\/.*$', 'l', 'g') " convert line comments and keep them b/c comments should not calculate new indent
 	let delims = substitute(delims, '\/\/.*', '', 'g') " remove line comments after text (indentation based on text not comment)
 	let delims = substitute(delims, '\".\{-}\(\\\)\@<!\"', '', 'g') " remove strings

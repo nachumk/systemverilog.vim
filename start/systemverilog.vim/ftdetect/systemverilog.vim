@@ -1,7 +1,7 @@
 "Author: Nachum Kanovsky
 "Email: nkanovsky@yahoo.com
-"Version: 1.13
+"Version: 1.14
 
 augroup filetypedetect
-	au! BufRead,BufNewFile *.v,*.vh,*.sv,*.svh setfiletype systemverilog
+	au! BufRead,BufNewFile *.v,*.vh,*.sv,*.svh,*.svp,*.svi setfiletype systemverilog
 augroup END
