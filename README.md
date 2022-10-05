@@ -7,7 +7,7 @@ SystemVerilog indent and syntax scripts
 
 Install by cloning repository:
 
-    git clone git://github.com/nachumk/systemverilog.vim ~/.vim/pack/systemverilog.vim
+    git clone https://github.com/nachumk/systemverilog.vim ~/.vim/pack/systemverilog.vim
 
 ### VIM 7 Install:
 
@@ -19,7 +19,7 @@ https://github.com/tpope/vim-pathogen
 
 Install by cloning repository:
 
-    git clone git://github.com/nachumk/systemverilog.vim ~/.vim/pack/systemverilog.vim
+    git clone https://github.com/nachumk/systemverilog.vim ~/.vim/pack/systemverilog.vim
 
 ### My .vimrc:
 
