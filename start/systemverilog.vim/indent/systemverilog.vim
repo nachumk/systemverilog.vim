@@ -1,6 +1,6 @@
 "Author: Nachum Kanovsky
 "Email: nkanovsky@yahoo.com
-"Version: 1.14
+"Version: 1.15
 "URL: https://github.com/nachumk/systemverilog.vim
 if exists("b:did_indent")
 	finish
@@ -47,9 +47,9 @@ function! s:ConvertToCodes( codeline )
 	let delims = substitute(delims, 'extern\s\+task', '', 'g') " remove extern task
 	let delims = substitute(delims, 'typedef\s\+class', '', 'g') " remove typedef class
 	let delims = substitute(delims, 'typedef', '', 'g') " remove typedef
-	let delims = substitute(delims, 'assert\s\+property', '', 'g') " remove assert property
-	let delims = substitute(delims, 'assume\s\+property', '', 'g') " remove assume property
-	let delims = substitute(delims, 'cover\s\+property', '', 'g') " remove cover property
+	let delims = substitute(delims, 'assert\s\+\%[\(property\)]', '', 'g') " remove assert with optional property
+	let delims = substitute(delims, 'assume\s\+\%[\(property\)]', '', 'g') " remove assume with optional property
+	let delims = substitute(delims, 'cover\s\+\%[\(property\)]', '', 'g') " remove cover with optional property
     let delims = substitute(delims, '`\s*\<\(begin_keywords\|celldefine\|default_nettype\|define\|else\|end_keywords\|endcelldefine\|endif\|ifdef\|ifndef\|include\|nounconnected_drive\|pragma\|resetall\|timescale\|unconnected_drive\|undef\|undefineall\)\>', 'z', 'g')
 	let delims = substitute(delims, '\<\(begin\|randcase\|case\|casex\|casez\|fork\)\>', 'b', 'g')
 	let delims = substitute(delims, '\<\(end\|endcase\|join\|join_any\|join_none\)\>', 'e', 'g')
@@ -144,10 +144,6 @@ let b:in_block_comment = 0
 
 "Intending to handle block comment by seeing /* and forward reading till end to find */ and then storing a buffer local variable indicating last line of block comment, and b:changedtick (change number which always increments). Using that variable I can ignore normal indentation until I get there.
 function! GetSystemVerilogIndent( line_num )
-	if a:line_num == 1
-		return 0
-	endif
-
 	let this_codeline = getline( a:line_num )
 	let prev1_line_num = prevnonblank( a:line_num - 1)
 	let prev1_codeline = getline( prev1_line_num )
@@ -226,6 +222,9 @@ function! GetSystemVerilogIndent( line_num )
 		return indent (a:line_num) + b:extra_block_indent
 	endif
 
+	if a:line_num == 1
+		return 0
+	endif
 	if (this_codes =~ s:PREPROCESSOR)
 		return 0
 	endif
